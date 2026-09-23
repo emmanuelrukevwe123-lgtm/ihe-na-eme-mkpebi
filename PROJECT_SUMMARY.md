@@ -146,7 +146,7 @@ curl -s -X POST localhost:5173/api/decide -H "content-type: application/json" -d
 1. Get a free Groq API key at console.groq.com.
 2. Install the tools: `npm i -g vercel` and `winget install GitHub.cli`.
 3. Log in yourself, because these open a browser: `gh auth login` and `vercel login`.
-4. Push: `gh repo create jev-decider --private --source=. --push`.
+4. Push: `gh repo create ihe-na-eme-mkpebi --private --source=. --push`.
 5. Import the repo at vercel.com → Add New Project.
 6. Set environment variables for Production, Preview and Development:
    - `DECIDER=groq`

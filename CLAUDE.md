@@ -1,4 +1,5 @@
-# jev-decider ("Decide For Me")
+# ihe-na-eme-mkpebi ("Decide For Me")
+Project, GitHub repo and Vercel project name: ihe-na-eme-mkpebi (Igbo, roughly "the thing that makes decisions"). The local folder is still jev-decider.
 Hand-drawn decision helper: situation + 2–6 options (optional outcomes) → pick, per-option probabilities, confidence.
 Vite + React SPA (JavaScript, NOT TypeScript) + one Vercel function at api/decide.js. ES modules only. Node 20+.
 Full write-up: PROJECT_SUMMARY.md. Original plan: `C:\Users\Manuel Ruky\Downloads\JEV decision app build plan.md`.
@@ -43,6 +44,6 @@ Done and committed (git, branch main, local only):
 
 ## Next steps (not done yet)
 - Groq has no free key for the owner, so it is dropped in favour of OpenRouter. The owner must do these (they need a browser): get an OpenRouter key (openrouter.ai, no card); install `vercel` (npm i -g) and `gh` (winget install GitHub.cli); run `gh auth login` and `vercel login`.
-- Then: `gh repo create jev-decider --private --source=. --push`, import the repo at vercel.com, set env DECIDER=jev + AI_GATEWAY_API_KEY until Jev's window ends, then DECIDER=openrouter + OPENROUTER_API_KEY, and smoke-test the live URL with each engine, including DECIDER=ev.
+- Then: `gh repo create ihe-na-eme-mkpebi --private --source=. --push`, import the repo at vercel.com, set env DECIDER=jev + AI_GATEWAY_API_KEY until Jev's window ends, then DECIDER=openrouter + OPENROUTER_API_KEY, and smoke-test the live URL with each engine, including DECIDER=ev.
 - If /api/decide 404s on Vercel, check Vercel's current Vite docs first (the plan flagged the root api/ folder as unverified).
 - Jev's free window ends 2026-09-25; switch production to DECIDER=openrouter then. Jev via AI Gateway verified working locally 2026-09-24 (~2.8s); it is free on the gateway until 2026-09-25. OpenRouter key verified working locally (real decisions in ~2–4s).
