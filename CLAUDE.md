@@ -37,11 +37,11 @@ Done and committed (git, branch main, local only):
 5. Landing page (how it works, "Just for fun!" sticky note, GitHub footer link); mobile layout polish.
 6. Decorative desk pencil (Pencil.jsx; bottom-right fixed on desktop, below the footer on ≤760px) and a 24px pencil mouse cursor (`--pencil-cursor` in index.css, hotspot at the tip).
 7. PROJECT_SUMMARY.md written.
-8. OpenRouter engine (lib/openrouter.js, DECIDER=openrouter, OPENROUTER_MODEL overrides the default google/gemma-4-31b-it:free). Free tier checked 2026-09-24: 20 req/min, 50 req/day (1000/day after $10 of credits). Fallback tested with a bogus key (401 → EV).
+8. OpenRouter engine (lib/openrouter.js, DECIDER=openrouter, OPENROUTER_MODEL is a comma-separated fallback list, default nvidia/nemotron-3-super-120b-a12b:free,openrouter/free; reasoning is disabled because thinking models ran past the 15s timeout; gemma-4 free models were 429 upstream on 2026-09-24). Free tier checked 2026-09-24: 20 req/min, 50 req/day (1000/day after $10 of credits). Fallback tested with a bogus key (401 → EV).
 9. Scheduled switch: DECIDER=jev, DECIDER_NEXT=openrouter, DECIDER_SWITCH_AT=2026-09-24T23:00:00+01:00 (owner is UTC+1). Before then Jev is tried first with OpenRouter as backup; after, OpenRouter only. Set the same three vars on Vercel.
 
 ## Next steps (not done yet)
 - Groq has no free key for the owner, so it is dropped in favour of OpenRouter. The owner must do these (they need a browser): get an OpenRouter key (openrouter.ai, no card); install `vercel` (npm i -g) and `gh` (winget install GitHub.cli); run `gh auth login` and `vercel login`.
 - Then: `gh repo create jev-decider --private --source=. --push`, import the repo at vercel.com, set env DECIDER=jev + TYPESAFE_API_KEY until Jev's window ends, then DECIDER=openrouter + OPENROUTER_API_KEY, and smoke-test the live URL with each engine, including DECIDER=ev.
 - If /api/decide 404s on Vercel, check Vercel's current Vite docs first (the plan flagged the root api/ folder as unverified).
-- Jev's free window ends 2026-09-25; switch production to DECIDER=openrouter then. As of 2026-09-24 the owner's TYPESAFE_API_KEY (jev_…, 36 chars, well-formed) gets 401 from api.typesafe.ai.
+- Jev's free window ends 2026-09-25; switch production to DECIDER=openrouter then. As of 2026-09-24 both TYPESAFE_API_KEY values tried (jev_… 36 chars, then vck… 60 chars) get 401 from api.typesafe.ai. OpenRouter key verified working locally (real decisions in ~2–4s).
