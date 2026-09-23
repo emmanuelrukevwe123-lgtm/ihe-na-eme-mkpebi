@@ -82,7 +82,7 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
                 />
               </label>
               <label>
-                <small>how good/bad? (+/−)</small>
+                <small>good/bad (±)</small>
                 <input
                   className="field"
                   type="number"
@@ -117,7 +117,7 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
         </div>
       ))}
 
-      <div className="row spread" style={{ marginTop: 18 }}>
+      <div className="row spread form-actions" style={{ marginTop: 18 }}>
         <button
           type="button"
           className="btn"
