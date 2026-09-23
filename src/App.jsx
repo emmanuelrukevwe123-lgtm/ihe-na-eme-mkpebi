@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import Landing from "./Landing.jsx";
 import Decider from "./Decider.jsx";
+import Pencil from "./components/Pencil.jsx";
 
 const currentView = () => (window.location.hash === "#decide" ? "decide" : "landing");
 
@@ -16,5 +17,10 @@ export default function App() {
     return () => window.removeEventListener("hashchange", onHash);
   }, []);
 
-  return view === "decide" ? <Decider /> : <Landing />;
+  return (
+    <>
+      <Pencil />
+      {view === "decide" ? <Decider /> : <Landing />}
+    </>
+  );
 }

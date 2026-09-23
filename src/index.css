@@ -41,6 +41,15 @@
 
 * { box-sizing: border-box; }
 
+/* Pencil mouse pointer; the hotspot (2 22) is the tip of the lead. */
+:root {
+  --pencil-cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 32 32'%3E%3Cg transform='translate(3 29) rotate(-45)' stroke='%232b2b3a' stroke-width='1.3' stroke-linejoin='round'%3E%3Crect x='9' y='-3.5' width='21' height='7' fill='%23f6c445'/%3E%3Cpath d='M9 0H30' stroke='%23c9951c' stroke-width='1'/%3E%3Crect x='30' y='-3.5' width='3' height='7' fill='%23c8c9d1'/%3E%3Crect x='33' y='-3.5' width='4' height='7' rx='1.5' fill='%23f2a0a8'/%3E%3Cpolygon points='0,0 9,-3.5 9,3.5' fill='%23edcfa5'/%3E%3Cpolygon points='0,0 3.6,-1.4 3.6,1.4' fill='%233a3a44' stroke='none'/%3E%3C/g%3E%3C/svg%3E") 2 22;
+}
+html, body { cursor: var(--pencil-cursor), auto; }
+a, button, label, summary, [role="button"] { cursor: var(--pencil-cursor), pointer; }
+input, textarea { cursor: text; }
+button:disabled { cursor: not-allowed; }
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -151,7 +160,6 @@ textarea.field:focus { border: 2px solid var(--ink); }
 
 .btn {
   position: relative;
-  cursor: pointer;
   background: transparent;
   border: none;
   padding: 8px 18px;
@@ -281,7 +289,7 @@ a.btn.primary { color: var(--accent-ink); }
 /* History */
 .history { list-style: none; padding: 0; margin: 0; }
 .history li { border-bottom: 1px dashed var(--pencil); padding: 8px 0; }
-.history button { background: none; border: none; cursor: pointer; text-align: left; padding: 0; width: 100%; }
+.history button { background: none; border: none; text-align: left; padding: 0; width: 100%; }
 .history button:hover .h-sit { text-decoration: underline wavy var(--accent); }
 .h-sit { display: block; }
 .h-meta { font-size: 0.85rem; color: var(--ink-soft); }
@@ -289,7 +297,7 @@ a.btn.primary { color: var(--accent-ink); }
 .footer { text-align: center; color: var(--ink-soft); font-size: 0.9rem; margin-top: 36px; }
 .footer p { margin: 4px 0; }
 .footer a, .back { color: var(--ink); text-decoration: underline wavy var(--accent); text-underline-offset: 4px; }
-.back { display: inline-block; margin-bottom: 10px; font-size: 0.95rem; color: var(--ink-soft); text-decoration-color: var(--pencil); }
+.back { display: block; width: fit-content; margin-bottom: 10px; font-size: 0.95rem; color: var(--ink-soft); text-decoration-color: var(--pencil); }
 
 /* Landing */
 .lead { font-size: 1.3rem; margin: 10px 0 24px; max-width: 34ch; }
@@ -344,8 +352,34 @@ a.btn.primary { color: var(--accent-ink); }
 .sticky-note p { margin: 0 0 10px; }
 .cta-bottom { justify-content: center; }
 
+/* Decorative pencil resting on the desk, behind the page content. */
+.page { position: relative; z-index: 1; }
+.desk-pencil {
+  position: fixed;
+  right: -30px;
+  bottom: 60px;
+  width: 340px;
+  z-index: 0;
+  transform: rotate(-32deg);
+  pointer-events: none;
+  filter: drop-shadow(3px 6px 4px rgba(0, 0, 0, 0.18));
+}
+.desk-pencil path { stroke: #2b2b3a; stroke-width: 2.5; }
+.desk-pencil .pencil-eraser { fill: #f2a0a8; }
+.desk-pencil .pencil-ferrule { fill: #c8c9d1; }
+.desk-pencil .pencil-line { stroke-width: 1.5; opacity: 0.7; }
+.desk-pencil .pencil-body { fill: #f6c445; }
+.desk-pencil .pencil-facet { stroke: #c9951c; stroke-width: 2; }
+.desk-pencil .pencil-wood { fill: #edcfa5; }
+.desk-pencil .pencil-lead { fill: #3a3a44; }
+.desk-pencil .pencil-shade { stroke: #b58f5e; stroke-width: 1.5; }
+.desk-pencil .pencil-scribble { stroke: var(--pencil); stroke-width: 2; }
+
 @media (max-width: 760px) {
   .steps { grid-template-columns: 1fr; gap: 28px; }
+  #root { position: relative; }
+  .page { padding-bottom: 150px; }
+  .desk-pencil { position: absolute; width: 220px; right: -20px; bottom: 36px; transform: rotate(-10deg); }
 }
 
 @media (pointer: coarse) {
@@ -355,7 +389,7 @@ a.btn.primary { color: var(--accent-ink); }
 
 @media (max-width: 560px) {
   body { background-image: repeating-linear-gradient(to bottom, transparent 0 31px, var(--paper-line) 31px 32px); font-size: 18px; }
-  .page { padding: 20px 16px 48px; }
+  .page { padding: 20px 16px 150px; }
   .sketch { padding: 16px 14px; }
   .sketch.tilt-l, .sketch.tilt-r { transform: none; }
   .outcome { margin-left: 0; grid-template-columns: 1fr 1fr auto; }
