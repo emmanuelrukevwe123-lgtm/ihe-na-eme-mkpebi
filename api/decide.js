@@ -68,14 +68,23 @@ export default async function handler(req, res) {
 
   const situation = (req.body.situation ?? "").trim();
   const options = clean(req.body.options);
-  const engine = ENGINES[process.env.DECIDER];
-  if (engine) {
+  const names = engineOrder();
+  for (const name of names) {
     try {
-      return res.status(200).json(normalize(await engine(situation, options), options));
+      return res.status(200).json(normalize(await ENGINES[name](situation, options), options));
     } catch (e) {
-      console.error(`[decide] ${process.env.DECIDER} failed:`, e.message);
-      return res.status(200).json(evDecide(options, "The AI engine was unavailable, so this uses expected value."));
+      console.error(`[decide] ${name} failed:`, e.message);
     }
   }
-  return res.status(200).json(evDecide(options));
+  const note = names.length ? "The AI engine was unavailable, so this uses expected value." : undefined;
+  return res.status(200).json(evDecide(options, note));
+}
+
+// DECIDER is tried first and DECIDER_NEXT if it fails. From DECIDER_SWITCH_AT
+// (an ISO time with offset) onwards, only DECIDER_NEXT is used.
+export function engineOrder(now = Date.now()) {
+  const { DECIDER, DECIDER_NEXT, DECIDER_SWITCH_AT } = process.env;
+  const switched = DECIDER_NEXT && Date.parse(DECIDER_SWITCH_AT) <= now;
+  const order = switched ? [DECIDER_NEXT] : [DECIDER, DECIDER_NEXT];
+  return [...new Set(order)].filter((n) => ENGINES[n]);
 }

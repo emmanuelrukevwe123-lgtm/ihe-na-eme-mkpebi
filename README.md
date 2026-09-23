@@ -11,7 +11,7 @@ One `/api/decide` endpoint, three interchangeable engines picked by the `DECIDER
 | `openrouter` | OpenRouter free model (default `google/gemma-4-31b-it:free`, override with `OPENROUTER_MODEL`); free tier is 50 requests/day | `OPENROUTER_API_KEY` |
 | `ev` (default) | Pure-JS expected value (`lib/ev.js`) | nothing |
 
-If the chosen AI engine fails or is rate-limited, the API falls back to expected value, so the app always answers.
+If the chosen AI engine fails or is rate-limited, the API tries `DECIDER_NEXT` (if set) and then falls back to expected value, so the app always answers. Set `DECIDER_SWITCH_AT` (ISO time with offset, e.g. `2026-09-24T23:00:00+01:00`) to use only `DECIDER_NEXT` from that time on.
 
 ## Run locally
 

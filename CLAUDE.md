@@ -13,7 +13,7 @@ Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx
 ## Contract
 POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
 -> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
-Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev); any engine error falls back to lib/ev.js with a note in rationale.
+Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale.
 The UI sends outcome chance as a percentage; Decider.jsx converts it to p = pct/100.
 
 ## Rules
@@ -38,6 +38,7 @@ Done and committed (git, branch main, local only):
 6. Decorative desk pencil (Pencil.jsx; bottom-right fixed on desktop, below the footer on ≤760px) and a 24px pencil mouse cursor (`--pencil-cursor` in index.css, hotspot at the tip).
 7. PROJECT_SUMMARY.md written.
 8. OpenRouter engine (lib/openrouter.js, DECIDER=openrouter, OPENROUTER_MODEL overrides the default google/gemma-4-31b-it:free). Free tier checked 2026-09-24: 20 req/min, 50 req/day (1000/day after $10 of credits). Fallback tested with a bogus key (401 → EV).
+9. Scheduled switch: DECIDER=jev, DECIDER_NEXT=openrouter, DECIDER_SWITCH_AT=2026-09-24T23:00:00+01:00 (owner is UTC+1). Before then Jev is tried first with OpenRouter as backup; after, OpenRouter only. Set the same three vars on Vercel.
 
 ## Next steps (not done yet)
 - Groq has no free key for the owner, so it is dropped in favour of OpenRouter. The owner must do these (they need a browser): get an OpenRouter key (openrouter.ai, no card); install `vercel` (npm i -g) and `gh` (winget install GitHub.cli); run `gh auth login` and `vercel login`.
