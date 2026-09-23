@@ -1,27 +1,49 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DecisionForm from "./components/DecisionForm.jsx";
 import ResultCard from "./components/ResultCard.jsx";
 import History from "./components/History.jsx";
 
 const STORE_KEY = "decide-history-v1";
+const DRAFT_KEY = "decide-draft-v1";
 const MAX_HISTORY = 20;
+const EMPTY_OPTIONS = [
+  { name: "", outcomes: [] },
+  { name: "", outcomes: [] },
+];
+
+function load(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key));
+  } catch {
+    return null;
+  }
+}
+
+function save(key, value) {
+  try {
+    localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    // storage unavailable (private mode); data just won't persist
+  }
+}
 
 function loadHistory() {
-  try {
-    const items = JSON.parse(localStorage.getItem(STORE_KEY));
-    return Array.isArray(items) ? items : [];
-  } catch {
-    return [];
-  }
+  const items = load(STORE_KEY);
+  return Array.isArray(items) ? items : [];
 }
 
-function saveHistory(items) {
-  try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(items));
-  } catch {
-    // storage unavailable (private mode); history just won't persist
-  }
+function loadDraft() {
+  const d = load(DRAFT_KEY);
+  const validOptions =
+    Array.isArray(d?.options) && d.options.length >= 2 && d.options.every((o) => Array.isArray(o?.outcomes));
+  return {
+    situation: typeof d?.situation === "string" ? d.situation : "",
+    options: validOptions ? d.options : EMPTY_OPTIONS,
+    result: d?.result?.probabilities ? d.result : null,
+  };
 }
+
+const saveHistory = (items) => save(STORE_KEY, items);
 
 function toPayload(situation, options) {
   const named = options.filter((o) => o.name.trim());
@@ -53,15 +75,22 @@ function toPayload(situation, options) {
 }
 
 export default function App() {
-  const [situation, setSituation] = useState("");
-  const [options, setOptions] = useState([
-    { name: "", outcomes: [] },
-    { name: "", outcomes: [] },
-  ]);
-  const [result, setResult] = useState(null);
+  const [draft] = useState(loadDraft);
+  const [situation, setSituation] = useState(draft.situation);
+  const [options, setOptions] = useState(draft.options);
+  const [result, setResult] = useState(draft.result);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState(loadHistory);
+
+  useEffect(() => save(DRAFT_KEY, { situation, options, result }), [situation, options, result]);
+
+  function startOver() {
+    setSituation("");
+    setOptions(EMPTY_OPTIONS);
+    setResult(null);
+    setError("");
+  }
 
   async function decide() {
     setError("");
@@ -92,7 +121,12 @@ export default function App() {
   return (
     <main className="page">
       <h1 className="title">Decide For Me</h1>
-      <p className="subtitle">Scribble down the dilemma. Get a pick, the odds, and how sure it is.</p>
+      <div className="row spread subtitle">
+        <span>Scribble down the dilemma. Get a pick, the odds, and how sure it is.</span>
+        <button type="button" className="btn small" onClick={startOver}>
+          start over
+        </button>
+      </div>
 
       <DecisionForm
         situation={situation}

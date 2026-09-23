@@ -13,9 +13,10 @@ export default function ResultCard({ result }) {
       </div>
 
       <div className="winner draw" key={result.choice + result.confidence}>
-        {result.choice}
-        <svg viewBox="0 0 200 60" preserveAspectRatio="none" aria-hidden="true">
-          <path d="M18 34 C 10 10, 70 2, 110 4 C 160 6, 196 14, 192 32 C 188 52, 130 58, 90 57 C 40 56, 4 48, 8 30 C 11 18, 40 10, 70 8" />
+        <span className="winner-text">{result.choice}</span>
+        <svg viewBox="0 0 200 16" preserveAspectRatio="none" aria-hidden="true">
+          <path d="M3 10 C 40 4, 80 13, 120 7 S 175 5, 197 9" />
+          <path d="M12 14 C 60 9, 120 15, 186 11" />
         </svg>
       </div>
 
