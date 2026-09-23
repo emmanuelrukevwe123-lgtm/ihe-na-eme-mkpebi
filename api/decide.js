@@ -1,8 +1,9 @@
 import { evDecide } from "../lib/ev.js";
 import { jevDecide } from "../lib/jev.js";
 import { groqDecide } from "../lib/groq.js";
+import { openrouterDecide } from "../lib/openrouter.js";
 
-const ENGINES = { jev: jevDecide, groq: groqDecide };
+const ENGINES = { jev: jevDecide, groq: groqDecide, openrouter: openrouterDecide };
 
 export function validate(body) {
   const { situation = "", options } = body ?? {};

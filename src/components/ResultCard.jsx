@@ -1,4 +1,4 @@
-const SOURCE_LABEL = { jev: "decided by Jev", groq: "decided by Groq AI", ev: "decided by expected value" };
+const SOURCE_LABEL = { jev: "decided by Jev", groq: "decided by Groq AI", openrouter: "decided by OpenRouter AI", ev: "decided by expected value" };
 
 const pct = (x) => `${Math.round(x * 100)}%`;
 

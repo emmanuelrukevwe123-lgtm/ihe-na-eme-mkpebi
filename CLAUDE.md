@@ -12,12 +12,12 @@ Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx
 
 ## Contract
 POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
--> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"ev"}
-Engine chosen by env DECIDER (jev | groq | ev, default ev); any engine error falls back to lib/ev.js with a note in rationale.
+-> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
+Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev); any engine error falls back to lib/ev.js with a note in rationale.
 The UI sends outcome chance as a percentage; Decider.jsx converts it to p = pct/100.
 
 ## Rules
-- IMPORTANT: API keys (TYPESAFE_API_KEY, GROQ_API_KEY) are server-only, read via process.env in api/ or lib/. Never use a VITE_ prefix for secrets.
+- IMPORTANT: API keys (TYPESAFE_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY) are server-only, read via process.env in api/ or lib/. Never use a VITE_ prefix for secrets.
 - Frontend must not know which engine answered except via `source`.
 - UI is deliberately hand-drawn: sketchy borders go on `::before` with `filter:url(#rough)` (filters defined in index.html) so text stays crisp. Colors are tokens on :root with a dark-mode (chalkboard) override. Keep new UI in that style.
 - Keep the winner text readable: nothing may be drawn over it (a red circle was removed for that reason).
@@ -37,9 +37,10 @@ Done and committed (git, branch main, local only):
 5. Landing page (how it works, "Just for fun!" sticky note, GitHub footer link); mobile layout polish.
 6. Decorative desk pencil (Pencil.jsx; bottom-right fixed on desktop, below the footer on ≤760px) and a 24px pencil mouse cursor (`--pencil-cursor` in index.css, hotspot at the tip).
 7. PROJECT_SUMMARY.md written.
+8. OpenRouter engine (lib/openrouter.js, DECIDER=openrouter, OPENROUTER_MODEL overrides the default google/gemma-4-31b-it:free). Free tier checked 2026-09-24: 20 req/min, 50 req/day (1000/day after $10 of credits). Fallback tested with a bogus key (401 → EV).
 
 ## Next steps (not done yet)
-- The owner must do these (they need a browser): get a Groq key (console.groq.com); install `vercel` (npm i -g) and `gh` (winget install GitHub.cli); run `gh auth login` and `vercel login`.
-- Then: `gh repo create jev-decider --private --source=. --push`, import the repo at vercel.com, set env DECIDER=groq and GROQ_API_KEY (plus TYPESAFE_API_KEY if Jev access is granted), and smoke-test the live URL with each engine, including DECIDER=ev.
+- Groq has no free key for the owner, so it is dropped in favour of OpenRouter. The owner must do these (they need a browser): get an OpenRouter key (openrouter.ai, no card); install `vercel` (npm i -g) and `gh` (winget install GitHub.cli); run `gh auth login` and `vercel login`.
+- Then: `gh repo create jev-decider --private --source=. --push`, import the repo at vercel.com, set env DECIDER=jev + TYPESAFE_API_KEY until Jev's window ends, then DECIDER=openrouter + OPENROUTER_API_KEY, and smoke-test the live URL with each engine, including DECIDER=ev.
 - If /api/decide 404s on Vercel, check Vercel's current Vite docs first (the plan flagged the root api/ folder as unverified).
-- Jev's free window ends 2026-09-25. Keep DECIDER=groq in production unless Jev's cost is wanted.
+- Jev's free window ends 2026-09-25; switch production to DECIDER=openrouter then. As of 2026-09-24 the owner's TYPESAFE_API_KEY (jev_…, 36 chars, well-formed) gets 401 from api.typesafe.ai.

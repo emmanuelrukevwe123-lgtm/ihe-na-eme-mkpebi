@@ -8,6 +8,7 @@ One `/api/decide` endpoint, three interchangeable engines picked by the `DECIDER
 |---|---|---|
 | `jev` | TypeSafe Jev via `@typesafe-ai/sdk` | `TYPESAFE_API_KEY` |
 | `groq` | Groq free tier, `openai/gpt-oss-20b` | `GROQ_API_KEY` |
+| `openrouter` | OpenRouter free model (default `google/gemma-4-31b-it:free`, override with `OPENROUTER_MODEL`); free tier is 50 requests/day | `OPENROUTER_API_KEY` |
 | `ev` (default) | Pure-JS expected value (`lib/ev.js`) | nothing |
 
 If the chosen AI engine fails or is rate-limited, the API falls back to expected value, so the app always answers.
