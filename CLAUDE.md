@@ -13,7 +13,7 @@ Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx
 ## Contract
 POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
 -> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
-Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale.
+Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale. OpenRouter retries once on a network error, 429, 5xx or unreadable reply (not on timeout or other 4xx), so EV is used only when OpenRouter really does not work.
 The UI sends outcome chance as a percentage; Decider.jsx converts it to p = pct/100.
 
 ## Rules
