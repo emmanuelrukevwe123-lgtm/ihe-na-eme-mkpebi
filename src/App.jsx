@@ -27,10 +27,10 @@ function toPayload(situation, options) {
   const named = options.filter((o) => o.name.trim());
   for (const o of named) {
     for (const oc of o.outcomes) {
-      if (oc.pct === "" && oc.value === "") continue;
+      if (oc.pct === "" && oc.value === "" && !oc.label?.trim()) continue;
       const p = Number(oc.pct);
       if (oc.pct === "" || oc.value === "" || !(p >= 0 && p <= 100))
-        return { error: `Fill in both chance (0–100) and value for every outcome of "${o.name.trim()}".` };
+        return { error: `For each outcome of "${o.name.trim()}", fill in a chance (0–100) and how good or bad it is.` };
     }
   }
   const names = named.map((o) => o.name.trim().toLowerCase());
@@ -41,7 +41,11 @@ function toPayload(situation, options) {
       options: named.map((o) => {
         const outcomes = o.outcomes
           .filter((oc) => oc.pct !== "" && oc.value !== "")
-          .map((oc) => ({ p: Number(oc.pct) / 100, value: Number(oc.value) }));
+          .map((oc) => ({
+            ...(oc.label?.trim() && { label: oc.label.trim() }),
+            p: Number(oc.pct) / 100,
+            value: Number(oc.value),
+          }));
         return outcomes.length ? { name: o.name.trim(), outcomes } : { name: o.name.trim() };
       }),
     },

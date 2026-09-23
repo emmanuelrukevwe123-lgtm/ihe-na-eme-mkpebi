@@ -28,7 +28,8 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
 
       <h2 className="label" style={{ marginTop: 22 }}>Your options</h2>
       <p className="hint" style={{ margin: 0 }}>
-        Two to six. Outcomes are optional: add a chance and a value (say +8 good, −3 bad) for a sharper answer.
+        Two to six. Optional: under each option, add outcomes — things that could happen if you pick it, how likely
+        they are, and how good (+8) or bad (−3) they'd be.
       </p>
 
       {options.map((o, i) => (
@@ -57,6 +58,16 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
 
           {o.outcomes.map((oc, k) => (
             <div className="outcome" key={k}>
+              <label className="outcome-what">
+                <small>what could happen?</small>
+                <input
+                  className="field"
+                  maxLength={120}
+                  placeholder={k === 0 ? "e.g. it goes well and I grow fast" : "e.g. it fails and I'm job-hunting again"}
+                  value={oc.label ?? ""}
+                  onChange={(e) => updateOutcome(i, k, { label: e.target.value })}
+                />
+              </label>
               <label>
                 <small>chance %</small>
                 <input
@@ -71,7 +82,7 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
                 />
               </label>
               <label>
-                <small>value (+/−)</small>
+                <small>how good/bad? (+/−)</small>
                 <input
                   className="field"
                   type="number"
@@ -97,9 +108,9 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
               <button
                 type="button"
                 className="btn link"
-                onClick={() => update(i, { outcomes: [...o.outcomes, { pct: "", value: "" }] })}
+                onClick={() => update(i, { outcomes: [...o.outcomes, { label: "", pct: "", value: "" }] })}
               >
-                + outcome
+                + what could happen
               </button>
             </div>
           )}

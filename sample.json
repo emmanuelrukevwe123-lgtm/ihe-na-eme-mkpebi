@@ -1,7 +1,19 @@
 {
   "situation": "I have two job offers and must answer by Friday. I value growth but have rent to pay.",
   "options": [
-    { "name": "Startup offer", "outcomes": [{ "p": 0.6, "value": 8 }, { "p": 0.4, "value": -3 }] },
-    { "name": "Stay at current job", "outcomes": [{ "p": 0.9, "value": 3 }, { "p": 0.1, "value": -1 }] }
+    {
+      "name": "Startup offer",
+      "outcomes": [
+        { "label": "It goes well and I grow fast", "p": 0.6, "value": 8 },
+        { "label": "It fails and I'm job-hunting again", "p": 0.4, "value": -3 }
+      ]
+    },
+    {
+      "name": "Stay at current job",
+      "outcomes": [
+        { "label": "Things carry on as usual", "p": 0.9, "value": 3 },
+        { "label": "I get laid off anyway", "p": 0.1, "value": -1 }
+      ]
+    }
   ]
 }

@@ -24,6 +24,8 @@ export function validate(body) {
       const v = Number(oc?.value);
       if (!(p >= 0 && p <= 1) || !Number.isFinite(v))
         return `Outcomes for "${name}" need a chance between 0 and 1 and a numeric value.`;
+      if (oc.label !== undefined && (typeof oc.label !== "string" || oc.label.length > 120))
+        return `Outcome descriptions for "${name}" must be text under 120 characters.`;
     }
   }
   return null;
@@ -33,7 +35,11 @@ function clean(options) {
   return options.map((o) => ({
     name: o.name.trim(),
     ...(o.outcomes?.length && {
-      outcomes: o.outcomes.map((oc) => ({ p: Number(oc.p), value: Number(oc.value) })),
+      outcomes: o.outcomes.map((oc) => ({
+        ...(oc.label?.trim() && { label: oc.label.trim() }),
+        p: Number(oc.p),
+        value: Number(oc.value),
+      })),
     }),
   }));
 }

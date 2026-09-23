@@ -8,7 +8,7 @@ ES modules only. Node 20+.
 - test API: `curl -s -X POST localhost:5173/api/decide -H 'content-type: application/json' -d @sample.json`
 
 ## Contract
-POST /api/decide {situation, options:[{name, outcomes?:[{p,value}]}]}
+POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
 -> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"ev"}
 Engine chosen by env DECIDER; any error falls back to lib/ev.js.
 
