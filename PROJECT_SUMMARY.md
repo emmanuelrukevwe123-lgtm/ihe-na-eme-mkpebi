@@ -2,6 +2,7 @@
 
 A hand-drawn, mobile-friendly web app that helps you make up your mind. You describe a situation, list 2–6 options, and get a pick with odds for every option and a confidence figure. It's a fun side project, not professional advice.
 
+- **Name:** `ihe-na-eme-mkpebi` (GitHub repo and Vercel project)
 - **Location:** `C:\Users\Manuel Ruky\Documents\funproJX\jev-decider`
 - **Author:** [emmanuelrukevwe123-lgtm on GitHub](https://github.com/emmanuelrukevwe123-lgtm)
 - **Based on:** `Downloads\JEV decision app build plan.md`
