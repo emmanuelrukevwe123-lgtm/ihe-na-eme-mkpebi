@@ -1,0 +1,7 @@
+{
+  "situation": "I have two job offers and must answer by Friday. I value growth but have rent to pay.",
+  "options": [
+    { "name": "Startup offer", "outcomes": [{ "p": 0.6, "value": 8 }, { "p": 0.4, "value": -3 }] },
+    { "name": "Stay at current job", "outcomes": [{ "p": 0.9, "value": 3 }, { "p": 0.1, "value": -1 }] }
+  ]
+}
