@@ -17,14 +17,14 @@ Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optiona
 The UI sends outcome chance as a percentage; Decider.jsx converts it to p = pct/100.
 
 ## Rules
-- IMPORTANT: API keys (TYPESAFE_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY) are server-only, read via process.env in api/ or lib/. Never use a VITE_ prefix for secrets.
+- IMPORTANT: API keys (AI_GATEWAY_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY) are server-only, read via process.env in api/ or lib/. Never use a VITE_ prefix for secrets.
 - Frontend must not know which engine answered except via `source`.
 - UI is deliberately hand-drawn: sketchy borders go on `::before` with `filter:url(#rough)` (filters defined in index.html) so text stays crisp. Colors are tokens on :root with a dark-mode (chalkboard) override. Keep new UI in that style.
 - Keep the winner text readable: nothing may be drawn over it (a red circle was removed for that reason).
 - Must stay responsive: check 320/390/768/1280 px with no horizontal scroll. Touch targets ≥44px on coarse pointers.
 - Views: `/` is Landing.jsx, `/#decide` is Decider.jsx, switched on location.hash in App.jsx. No router, so no vercel.json rewrites needed.
 - localStorage keys: `decide-history-v1` (last 20 decisions) and `decide-draft-v1` (form + last result). Wrap every access in try/catch.
-- Jev SDK client uses timeout 6000 and retry maxRetries 1 (the SDK default is ~27s worst case, too slow for fallback).
+- Jev is called through the Vercel AI Gateway with the AI SDK (`experimental_evaluate`, model `typesafe-ai/jev`, key AI_GATEWAY_API_KEY = vck_...). Timeout 6000 and maxRetries 1 so fallback stays fast. The old @typesafe-ai/sdk was removed: vck_ keys get 401 from api.typesafe.ai.
 - Out of scope: auth, database, React Router, TypeScript.
 - Run `npm run build` before every commit; commit after each verified change.
 
@@ -39,9 +39,10 @@ Done and committed (git, branch main, local only):
 7. PROJECT_SUMMARY.md written.
 8. OpenRouter engine (lib/openrouter.js, DECIDER=openrouter, OPENROUTER_MODEL is a comma-separated fallback list, default nvidia/nemotron-3-super-120b-a12b:free,openrouter/free; reasoning is disabled because thinking models ran past the 15s timeout; gemma-4 free models were 429 upstream on 2026-09-24). Free tier checked 2026-09-24: 20 req/min, 50 req/day (1000/day after $10 of credits). Fallback tested with a bogus key (401 → EV).
 9. Scheduled switch: DECIDER=jev, DECIDER_NEXT=openrouter, DECIDER_SWITCH_AT=2026-09-24T23:00:00+01:00 (owner is UTC+1). Before then Jev is tried first with OpenRouter as backup; after, OpenRouter only. Set the same three vars on Vercel.
+10. Jev moved to the Vercel AI Gateway (lib/jev.js uses the `ai` package; @typesafe-ai/sdk removed).
 
 ## Next steps (not done yet)
 - Groq has no free key for the owner, so it is dropped in favour of OpenRouter. The owner must do these (they need a browser): get an OpenRouter key (openrouter.ai, no card); install `vercel` (npm i -g) and `gh` (winget install GitHub.cli); run `gh auth login` and `vercel login`.
-- Then: `gh repo create jev-decider --private --source=. --push`, import the repo at vercel.com, set env DECIDER=jev + TYPESAFE_API_KEY until Jev's window ends, then DECIDER=openrouter + OPENROUTER_API_KEY, and smoke-test the live URL with each engine, including DECIDER=ev.
+- Then: `gh repo create jev-decider --private --source=. --push`, import the repo at vercel.com, set env DECIDER=jev + AI_GATEWAY_API_KEY until Jev's window ends, then DECIDER=openrouter + OPENROUTER_API_KEY, and smoke-test the live URL with each engine, including DECIDER=ev.
 - If /api/decide 404s on Vercel, check Vercel's current Vite docs first (the plan flagged the root api/ folder as unverified).
-- Jev's free window ends 2026-09-25; switch production to DECIDER=openrouter then. As of 2026-09-24 both TYPESAFE_API_KEY values tried (jev_… 36 chars, then vck… 60 chars) get 401 from api.typesafe.ai. OpenRouter key verified working locally (real decisions in ~2–4s).
+- Jev's free window ends 2026-09-25; switch production to DECIDER=openrouter then. Jev via AI Gateway verified working locally 2026-09-24 (~2.8s); it is free on the gateway until 2026-09-25. OpenRouter key verified working locally (real decisions in ~2–4s).

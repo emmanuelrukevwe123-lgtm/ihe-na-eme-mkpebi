@@ -6,7 +6,7 @@ One `/api/decide` endpoint, three interchangeable engines picked by the `DECIDER
 
 | `DECIDER` | Engine | Needs |
 |---|---|---|
-| `jev` | TypeSafe Jev via `@typesafe-ai/sdk` | `TYPESAFE_API_KEY` |
+| `jev` | TypeSafe Jev via the Vercel AI Gateway (`ai` SDK, `typesafe-ai/jev`; free until 2026-09-25) | `AI_GATEWAY_API_KEY` |
 | `groq` | Groq free tier, `openai/gpt-oss-20b` | `GROQ_API_KEY` |
 | `openrouter` | OpenRouter free models (default `nvidia/nemotron-3-super-120b-a12b:free`, then `openrouter/free`; override with a comma-separated `OPENROUTER_MODEL`); free tier is 50 requests/day | `OPENROUTER_API_KEY` |
 | `ev` (default) | Pure-JS expected value (`lib/ev.js`) | nothing |
@@ -23,6 +23,6 @@ npm run dev                  # http://localhost:5173, API included
 
 ## Deploy (Vercel Hobby)
 
-Import the repo at vercel.com, then set `DECIDER`, `GROQ_API_KEY` and (optionally) `TYPESAFE_API_KEY` under Settings → Environment Variables. Every push to `main` redeploys.
+Import the repo at vercel.com, then set `DECIDER`, `GROQ_API_KEY` and (optionally) `AI_GATEWAY_API_KEY` under Settings → Environment Variables. Every push to `main` redeploys.
 
 Output is advice, not an instruction; nothing in the app acts on it.

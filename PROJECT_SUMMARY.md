@@ -36,7 +36,7 @@ Browser (React SPA, localStorage)
       │  POST /api/decide
       ▼
 Vercel Function: api/decide.js ── validates input, picks engine via DECIDER env var
-      ├── DECIDER=jev  → lib/jev.js   (TypeSafe Jev via @typesafe-ai/sdk)
+      ├── DECIDER=jev  → lib/jev.js   (Jev via Vercel AI Gateway, `ai` SDK)
       ├── DECIDER=groq → lib/groq.js  (Groq free tier, openai/gpt-oss-20b, plain fetch)
       └── DECIDER=ev / unset / any error → lib/ev.js (pure-JS expected value, always works)
 ```
@@ -63,7 +63,7 @@ POST /api/decide
 
 ### Security
 
-- `TYPESAFE_API_KEY`, `GROQ_API_KEY` and `DECIDER` are **server-only**, read through `process.env`. They must never have a `VITE_` prefix.
+- `AI_GATEWAY_API_KEY`, `GROQ_API_KEY`, `OPENROUTER_API_KEY` and `DECIDER` are **server-only**, read through `process.env`. They must never have a `VITE_` prefix.
 - The output is advice only. Nothing in the app acts on it.
 
 ---
@@ -99,7 +99,7 @@ jev-decider/
 ├── api/decide.js              Router: validation, engine choice, normalization, EV fallback
 ├── lib/ev.js                  Expected-value scorer
 ├── lib/groq.js                Groq engine
-├── lib/jev.js                 Jev engine (@typesafe-ai/sdk)
+├── lib/jev.js                 Jev engine (Vercel AI Gateway)
 ├── src/
 │   ├── main.jsx               React entry point
 │   ├── App.jsx                Switches Landing ⇄ Decider on location.hash; renders the desk pencil
@@ -115,7 +115,7 @@ jev-decider/
 ├── index.html                 Fonts, SVG roughness filters, page title
 ├── vite.config.js             React plugin + local /api middleware (no Vercel CLI needed for dev)
 ├── sample.json                Example request for curl testing
-├── .env.example               DECIDER, GROQ_API_KEY, TYPESAFE_API_KEY
+├── .env.example               DECIDER, keys (AI_GATEWAY_API_KEY, OPENROUTER_API_KEY, GROQ_API_KEY)
 ├── CLAUDE.md                  Rules and commands for Claude Code
 └── README.md                  Short public readme
 ```
@@ -151,7 +151,7 @@ curl -s -X POST localhost:5173/api/decide -H "content-type: application/json" -d
 6. Set environment variables for Production, Preview and Development:
    - `DECIDER=groq`
    - `GROQ_API_KEY`
-   - `TYPESAFE_API_KEY`, only if you have Jev access.
+   - `AI_GATEWAY_API_KEY` (a vck_ key) for Jev.
 7. Smoke-test the live URL. Then set `DECIDER=ev` and check that it still answers.
 
 If `/api/decide` returns 404 on Vercel, check Vercel's current Vite docs. The plan flagged that the root `api/` folder wasn't re-verified. Vercel Hobby is for non-commercial use only.
