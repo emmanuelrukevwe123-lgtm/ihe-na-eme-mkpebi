@@ -3,7 +3,7 @@
 A hand-drawn, mobile-friendly web app that helps you make up your mind. You describe a situation, list 2–6 options, and get a pick with odds for every option and a confidence figure. It's a fun side project, not professional advice.
 
 - **Name:** `ihe-na-eme-mkpebi` (GitHub repo and Vercel project)
-- **Location:** `C:\Users\Manuel Ruky\Documents\funproJX\jev-decider`
+- **Location:** `C:\Users\Manuel Ruky\Documents\funproJX\ihe-na-eme-mkpebi`
 - **Author:** [emmanuelrukevwe123-lgtm on GitHub](https://github.com/emmanuelrukevwe123-lgtm)
 - **Based on:** `Downloads\JEV decision app build plan.md`
 - **Status:** built, tested locally and committed to git. Not yet pushed to GitHub or deployed to Vercel.
@@ -126,7 +126,7 @@ ihe-na-eme-mkpebi/
 ## 5. Running it
 
 ```bash
-cd "C:\Users\Manuel Ruky\Documents\funproJX\jev-decider"
+cd "C:\Users\Manuel Ruky\Documents\funproJX\ihe-na-eme-mkpebi"
 npm install
 copy .env.example .env.local     # add keys; DECIDER=groq to use the AI
 npm run dev                      # http://localhost:5173 (API included)

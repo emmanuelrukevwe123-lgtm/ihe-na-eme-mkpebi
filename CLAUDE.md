@@ -1,5 +1,5 @@
 # ihe-na-eme-mkpebi ("Decide For Me")
-Project, GitHub repo and Vercel project name: ihe-na-eme-mkpebi (Igbo, roughly "the thing that makes decisions"). The local folder is funproJXihe-na-eme-mkpebi (renamed from jev-decider on 2026-09-24).
+Project, GitHub repo and Vercel project name: ihe-na-eme-mkpebi (Igbo, roughly "the thing that makes decisions"). The local folder is funproJX\ihe-na-eme-mkpebi (renamed from jev-decider on 2026-09-24).
 Hand-drawn decision helper: situation + 2–6 options (optional outcomes) → pick, per-option probabilities, confidence.
 Vite + React SPA (JavaScript, NOT TypeScript) + one Vercel function at api/decide.js. ES modules only. Node 20+.
 Full write-up: PROJECT_SUMMARY.md. Original plan: `C:\Users\Manuel Ruky\Downloads\JEV decision app build plan.md`.
