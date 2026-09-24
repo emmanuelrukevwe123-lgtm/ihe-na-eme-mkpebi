@@ -1,3 +1,5 @@
+import MicButton from "./MicButton.jsx";
+
 const MAX_OPTIONS = 6;
 
 export default function DecisionForm({
@@ -21,9 +23,17 @@ export default function DecisionForm({
         onSubmit();
       }}
     >
-      <label className="label" htmlFor="situation">
-        What's the situation?
-      </label>
+      <div className="row spread label-row">
+        <label className="label" htmlFor="situation">
+          What's the situation?
+        </label>
+        <MicButton
+          value={situation}
+          onChange={setSituation}
+          label="Speak the situation"
+          maxLength={4000}
+        />
+      </div>
       <textarea
         id="situation"
         className="field"
@@ -60,6 +70,17 @@ export default function DecisionForm({
               }
               value={o.name}
               onChange={(e) => update(i, { name: e.target.value })}
+            />
+            <MicButton
+              value={o.name}
+              // Speech results arrive over time, so update from the latest state.
+              onChange={(name) =>
+                setOptions((prev) =>
+                  prev.map((p, j) => (j === i ? { ...p, name } : p)),
+                )
+              }
+              label={`Speak option ${i + 1}`}
+              maxLength={80}
             />
             {options.length > 2 && (
               <button

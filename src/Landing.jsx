@@ -55,7 +55,9 @@ export default function Landing() {
         </p>
         <p>
           Your past decisions are saved only in your own browser. What you type
-          is sent to the AI to get an answer.
+          is sent to the AI to get an answer. If you use the 🎤 button, your
+          browser may send your voice to Google, Apple or Microsoft to turn it
+          into text.
         </p>
       </aside>
 
