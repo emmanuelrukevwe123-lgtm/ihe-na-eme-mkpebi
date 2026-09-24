@@ -96,7 +96,7 @@ POST /api/decide
 ## 4. Files
 
 ```
-jev-decider/
+ihe-na-eme-mkpebi/
 ├── api/decide.js              Router: validation, engine choice, normalization, EV fallback
 ├── lib/ev.js                  Expected-value scorer
 ├── lib/groq.js                Groq engine
