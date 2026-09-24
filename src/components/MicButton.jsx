@@ -13,10 +13,22 @@ const SILENCE_MS = 4000;
 // Only one mic listens at a time: this stops whichever one is on.
 let stopActive = null;
 
-export default function MicButton({ value, onChange, label, maxLength }) {
+// onDone(text) runs once when listening stops, if anything was heard.
+export default function MicButton({
+  value,
+  onChange,
+  onDone,
+  label,
+  maxLength,
+}) {
   const [listening, setListening] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const stopRef = useRef(null);
+  // Listening outlives the render that started it, so read the latest onDone.
+  const onDoneRef = useRef(onDone);
+  useEffect(() => {
+    onDoneRef.current = onDone;
+  });
 
   useEffect(() => () => stopRef.current?.(), []);
 
@@ -31,10 +43,14 @@ export default function MicButton({ value, onChange, label, maxLength }) {
     // Speech is added after whatever is already typed.
     const base = value.trim() ? `${value.trimEnd()} ` : "";
     let timer;
+    let heard = "";
+    let stopped = false;
     // The button turns off right away; the browser can take a while to
     // report that it has finished, and sometimes never does.
     const stop = () => {
       clearTimeout(timer);
+      if (stopped) return;
+      stopped = true;
       setListening(false);
       if (stopActive === stop) stopActive = null;
       if (stopRef.current === stop) stopRef.current = null;
@@ -43,19 +59,22 @@ export default function MicButton({ value, onChange, label, maxLength }) {
       } catch {
         // already stopped
       }
+      if (heard) onDoneRef.current?.(heard);
     };
     const waitForSilence = () => {
       clearTimeout(timer);
       timer = setTimeout(stop, SILENCE_MS);
     };
     r.onresult = (e) => {
+      if (stopped) return;
       waitForSilence();
       const said = [...e.results]
         .map((res) => res[0].transcript)
         .join(" ")
         .replace(/\s+/g, " ")
         .trim();
-      onChange((base + said).slice(0, maxLength));
+      heard = (base + said).slice(0, maxLength);
+      onChange(heard);
     };
     r.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed")

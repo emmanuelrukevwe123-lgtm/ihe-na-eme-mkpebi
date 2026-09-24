@@ -1,3 +1,4 @@
+import { useState } from "react";
 import MicButton from "./MicButton.jsx";
 
 const MAX_OPTIONS = 6;
@@ -14,6 +15,44 @@ export default function DecisionForm({
     setOptions(options.map((o, j) => (j === i ? { ...o, ...patch } : o)));
 
   const filled = options.filter((o) => o.name.trim()).length;
+  const [finding, setFinding] = useState(false);
+  const [findNote, setFindNote] = useState("");
+
+  // After the situation is spoken, let the AI fill in the options, but only
+  // if the user hasn't started typing them.
+  async function findOptions(text) {
+    if (filled) return;
+    setFinding(true);
+    setFindNote("");
+    try {
+      const res = await fetch("/api/options", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ situation: text }),
+        signal: AbortSignal.timeout(20000),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok)
+        throw new Error(
+          data.error || "Couldn't find the options. Type them in instead.",
+        );
+      if (!data.options?.length)
+        return setFindNote("I couldn't spot the options. Type them in below.");
+      setOptions((prev) =>
+        prev.some((o) => o.name.trim())
+          ? prev
+          : data.options.map((name) => ({ name })),
+      );
+    } catch (e) {
+      setFindNote(
+        e.name === "TimeoutError"
+          ? "Couldn't find the options. Type them in instead."
+          : e.message,
+      );
+    } finally {
+      setFinding(false);
+    }
+  }
 
   return (
     <form
@@ -30,6 +69,7 @@ export default function DecisionForm({
         <MicButton
           value={situation}
           onChange={setSituation}
+          onDone={findOptions}
           label="Speak the situation"
           maxLength={4000}
         />
@@ -52,6 +92,16 @@ export default function DecisionForm({
       <p className="hint" style={{ margin: 0 }}>
         The two to six choices you're torn between.
       </p>
+      {finding && (
+        <p className="hint finding" aria-live="polite">
+          picking out your options<span>.</span><span>.</span><span>.</span>
+        </p>
+      )}
+      {findNote && !finding && (
+        <p className="hint" role="status">
+          {findNote}
+        </p>
+      )}
 
       {options.map((o, i) => (
         <div className="option" key={i}>
@@ -108,7 +158,7 @@ export default function DecisionForm({
         <button
           type="submit"
           className="btn primary"
-          disabled={loading || filled < 2}
+          disabled={loading || finding || filled < 2}
         >
           {loading ? "thinking…" : "Decide!"}
         </button>
