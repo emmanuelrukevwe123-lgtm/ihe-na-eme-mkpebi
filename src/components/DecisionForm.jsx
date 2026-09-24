@@ -1,5 +1,4 @@
 const MAX_OPTIONS = 6;
-const MAX_OUTCOMES = 10;
 
 export default function DecisionForm({
   situation,
@@ -11,12 +10,6 @@ export default function DecisionForm({
 }) {
   const update = (i, patch) =>
     setOptions(options.map((o, j) => (j === i ? { ...o, ...patch } : o)));
-  const updateOutcome = (i, k, patch) =>
-    update(i, {
-      outcomes: options[i].outcomes.map((oc, j) =>
-        j === k ? { ...oc, ...patch } : oc,
-      ),
-    });
 
   const filled = options.filter((o) => o.name.trim()).length;
 
@@ -35,18 +28,19 @@ export default function DecisionForm({
         id="situation"
         className="field"
         maxLength={4000}
-        placeholder="e.g. I got two job offers and need to answer by Friday…"
+        placeholder="e.g. I got two job offers and need to answer by Friday. The startup pays less but I'd learn a lot; I have rent to cover…"
         value={situation}
         onChange={(e) => setSituation(e.target.value)}
       />
+      <p className="hint" style={{ margin: "4px 0 0" }}>
+        The more you say about what matters to you, the better the pick.
+      </p>
 
       <h2 className="label" style={{ marginTop: 22 }}>
         Your options
       </h2>
       <p className="hint" style={{ margin: 0 }}>
-        Two to six. Optional: under each option, add outcomes — things that
-        could happen if you pick it, how likely they are, and how good (+8) or
-        bad (−3) they'd be.
+        Two to six. Just name them. The weighing is on us.
       </p>
 
       {options.map((o, i) => (
@@ -78,82 +72,6 @@ export default function DecisionForm({
               </button>
             )}
           </div>
-
-          {o.outcomes.map((oc, k) => (
-            <div className="outcome" key={k}>
-              <label className="outcome-what">
-                <small>what could happen?</small>
-                <input
-                  className="field"
-                  maxLength={120}
-                  placeholder={
-                    k === 0
-                      ? "e.g. it goes well and I grow fast"
-                      : "e.g. it fails and I'm job-hunting again"
-                  }
-                  value={oc.label ?? ""}
-                  onChange={(e) =>
-                    updateOutcome(i, k, { label: e.target.value })
-                  }
-                />
-              </label>
-              <label>
-                <small>chance %</small>
-                <input
-                  className="field"
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="any"
-                  inputMode="decimal"
-                  value={oc.pct}
-                  onChange={(e) => updateOutcome(i, k, { pct: e.target.value })}
-                />
-              </label>
-              <label>
-                <small>good/bad (±)</small>
-                <input
-                  className="field"
-                  type="number"
-                  step="any"
-                  inputMode="decimal"
-                  value={oc.value}
-                  onChange={(e) =>
-                    updateOutcome(i, k, { value: e.target.value })
-                  }
-                />
-              </label>
-              <button
-                type="button"
-                className="btn small"
-                aria-label="Remove outcome"
-                onClick={() =>
-                  update(i, { outcomes: o.outcomes.filter((_, j) => j !== k) })
-                }
-              >
-                ✗
-              </button>
-            </div>
-          ))}
-
-          {o.outcomes.length < MAX_OUTCOMES && (
-            <div style={{ marginLeft: 36, marginTop: 4 }}>
-              <button
-                type="button"
-                className="btn link"
-                onClick={() =>
-                  update(i, {
-                    outcomes: [
-                      ...o.outcomes,
-                      { label: "", pct: "", value: "" },
-                    ],
-                  })
-                }
-              >
-                + what could happen
-              </button>
-            </div>
-          )}
         </div>
       ))}
 
@@ -162,7 +80,7 @@ export default function DecisionForm({
           type="button"
           className="btn"
           disabled={options.length >= MAX_OPTIONS}
-          onClick={() => setOptions([...options, { name: "", outcomes: [] }])}
+          onClick={() => setOptions([...options, { name: "" }])}
         >
           + add option
         </button>

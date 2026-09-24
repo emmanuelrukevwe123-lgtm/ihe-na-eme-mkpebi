@@ -57,7 +57,7 @@ POST /api/decide
 
 ### Engines
 
-- **Expected value (`lib/ev.js`):** EV = Σ p × value for each option. The EVs go through a softmax to make pseudo-probabilities, and the highest EV wins. With no outcomes, every option ties.
+- **Expected value (`lib/ev.js`):** EV = Σ p × value for each option. The EVs go through a softmax to make pseudo-probabilities, and the highest EV wins. With no outcomes, every option ties, so when the AI engines all fail and no outcomes were sent (the web form sends names only), the API returns 503 instead.
 - **Groq (`lib/groq.js`):** JSON-mode chat completion. The prompt treats user text as data, not instructions. Timeout is 10 s.
 - **Jev (`lib/jev.js`):** a single `choice` question whose options are the user's options. Timeout is 6 s with 1 retry, instead of the SDK's default of about 27 s.
 - **Safety net:** `api/decide.js` normalizes every AI reply. It checks that the choice is a real option, rescales the probabilities to sum to 1, clamps confidence to 0–1 and caps the rationale's length.
@@ -108,7 +108,7 @@ ihe-na-eme-mkpebi/
 │   ├── Decider.jsx            Decision screen: state, API call, localStorage draft and history
 │   ├── index.css              All styles and theme tokens (light and dark)
 │   └── components/
-│       ├── DecisionForm.jsx   Situation, options, outcomes
+│       ├── DecisionForm.jsx   Situation and option names
 │       ├── ResultCard.jsx     Winner, bars, confidence, rationale, engine stamp
 │       ├── History.jsx        Past decisions
 │       ├── Footer.jsx         GitHub link

@@ -97,6 +97,12 @@ export default async function handler(req, res) {
       console.error(`[decide] ${name} failed:`, e.message);
     }
   }
+  // Without outcomes, expected value is a tie and would just pick option 1.
+  const hasOutcomes = options.some((o) => o.outcomes?.length);
+  if (names.length && !hasOutcomes)
+    return res
+      .status(503)
+      .json({ error: "Couldn't make a pick right now. Try again in a moment." });
   const note = names.length
     ? "The AI engine was unavailable, so this uses expected value."
     : undefined;

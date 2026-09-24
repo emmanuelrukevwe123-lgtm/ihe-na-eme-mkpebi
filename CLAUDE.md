@@ -14,8 +14,8 @@ Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx
 ## Contract
 POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
 -> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
-Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale. OpenRouter retries once on a network error, 429, 5xx or unreadable reply (not on timeout or other 4xx), so EV is used only when OpenRouter really does not work.
-The UI sends outcome chance as a percentage; Decider.jsx converts it to p = pct/100.
+Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale, but only when outcomes were sent; with names only the API returns 503 {error} (EV would be a meaningless tie). OpenRouter retries once on a network error, 429, 5xx or unreadable reply (not on timeout or other 4xx), so EV is used only when OpenRouter really does not work.
+The UI sends option names only (no outcomes): the AI does the weighing. outcomes stay in the API contract for direct callers and the EV fallback.
 
 ## Rules
 - IMPORTANT: API keys (AI_GATEWAY_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY) are server-only, read via process.env in api/ or lib/. Never use a VITE_ prefix for secrets.
@@ -33,7 +33,7 @@ The UI sends outcome chance as a percentage; Decider.jsx converts it to p = pct/
 Done and committed (git, branch main, local only):
 1. Engines + API: ev/groq/jev, validation, response normalization, EV fallback. Tested fallback with bogus keys (401 → EV in ~1s).
 2. Hand-drawn UI: notebook paper, Caveat/Patrick Hand fonts, wobbly borders, hatched probability bars, highlighter + underline on the winner.
-3. Outcomes have a "what could happen?" label plus chance % and good/bad (±).
+3. Outcomes (label, chance %, good/bad) were in the form but removed 2026-09-24: users only name options.
 4. Form, result and history persist across refresh; "start over" button clears the form.
 5. Landing page (how it works, "Just for fun!" sticky note, GitHub footer link); mobile layout polish.
 6. Decorative desk pencil (Pencil.jsx; bottom-right fixed on desktop, below the footer on ≤760px) and a 24px pencil mouse cursor (`--pencil-cursor` in index.css, hotspot at the tip).

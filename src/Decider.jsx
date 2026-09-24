@@ -7,10 +7,7 @@ import Footer from "./components/Footer.jsx";
 const STORE_KEY = "decide-history-v1";
 const DRAFT_KEY = "decide-draft-v1";
 const MAX_HISTORY = 20;
-const EMPTY_OPTIONS = [
-  { name: "", outcomes: [] },
-  { name: "", outcomes: [] },
-];
+const EMPTY_OPTIONS = [{ name: "" }, { name: "" }];
 
 function load(key) {
   try {
@@ -33,13 +30,17 @@ function loadHistory() {
   return Array.isArray(items) ? items : [];
 }
 
+// Older drafts and history entries also carry outcomes; keep only the names.
+const namesOnly = (options) =>
+  Array.isArray(options) && options.length >= 2 && options.every((o) => typeof o?.name === "string")
+    ? options.map((o) => ({ name: o.name }))
+    : null;
+
 function loadDraft() {
   const d = load(DRAFT_KEY);
-  const validOptions =
-    Array.isArray(d?.options) && d.options.length >= 2 && d.options.every((o) => Array.isArray(o?.outcomes));
   return {
     situation: typeof d?.situation === "string" ? d.situation : "",
-    options: validOptions ? d.options : EMPTY_OPTIONS,
+    options: namesOnly(d?.options) ?? EMPTY_OPTIONS,
     result: d?.result?.probabilities ? d.result : null,
   };
 }
@@ -47,32 +48,10 @@ function loadDraft() {
 const saveHistory = (items) => save(STORE_KEY, items);
 
 function toPayload(situation, options) {
-  const named = options.filter((o) => o.name.trim());
-  for (const o of named) {
-    for (const oc of o.outcomes) {
-      if (oc.pct === "" && oc.value === "" && !oc.label?.trim()) continue;
-      const p = Number(oc.pct);
-      if (oc.pct === "" || oc.value === "" || !(p >= 0 && p <= 100))
-        return { error: `For each outcome of "${o.name.trim()}", fill in a chance (0–100) and how good or bad it is.` };
-    }
-  }
-  const names = named.map((o) => o.name.trim().toLowerCase());
-  if (new Set(names).size !== names.length) return { error: "Two options have the same name." };
-  return {
-    body: {
-      situation: situation.trim(),
-      options: named.map((o) => {
-        const outcomes = o.outcomes
-          .filter((oc) => oc.pct !== "" && oc.value !== "")
-          .map((oc) => ({
-            ...(oc.label?.trim() && { label: oc.label.trim() }),
-            p: Number(oc.pct) / 100,
-            value: Number(oc.value),
-          }));
-        return outcomes.length ? { name: o.name.trim(), outcomes } : { name: o.name.trim() };
-      }),
-    },
-  };
+  const names = options.map((o) => o.name.trim()).filter(Boolean);
+  if (new Set(names.map((n) => n.toLowerCase())).size !== names.length)
+    return { error: "Two options have the same name." };
+  return { body: { situation: situation.trim(), options: names.map((name) => ({ name })) } };
 }
 
 export default function Decider() {
@@ -151,7 +130,7 @@ export default function Decider() {
         items={history}
         onPick={(h) => {
           setSituation(h.situation);
-          setOptions(h.options);
+          setOptions(namesOnly(h.options) ?? EMPTY_OPTIONS);
           setResult(h.result);
           setError("");
           window.scrollTo({ top: 0, behavior: "smooth" });

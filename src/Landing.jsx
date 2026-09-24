@@ -3,15 +3,15 @@ import Footer from "./components/Footer.jsx";
 const STEPS = [
   {
     title: "Describe it",
-    body: "Write down the situation you're stuck on — a job, a trip, a purchase, anything.",
+    body: "Write down the situation you're stuck on (a job, a trip, a purchase, anything) and what matters to you.",
   },
   {
-    title: "List your options",
-    body: "Two to six choices. If you like, add what could happen with each, how likely it is, and how good or bad it'd be.",
+    title: "Name your options",
+    body: "Two to six choices. Just the names. No numbers, no maths, no pros-and-cons list.",
   },
   {
     title: "Get a pick",
-    body: "See which option wins, the odds for every option, and how confident the app is.",
+    body: "The AI weighs everything for you and tells you which option to go with, the odds for each, and how sure it is.",
   },
 ];
 
@@ -20,7 +20,7 @@ export default function Landing() {
     <main className="page landing">
       <h1 className="title">Decide For Me</h1>
       <p className="lead">
-        A tiny, hand-drawn app that helps you make up your mind when you can't.
+        An app that makes up your mind for you when you can't.
       </p>
 
       <a className="btn primary cta" href="#decide">
@@ -40,9 +40,10 @@ export default function Landing() {
 
       <h2 className="label section-head">Under the hood</h2>
       <p>
-        An AI decision model weighs your situation and options. If the AI is
-        busy or unavailable, the app falls back to good old expected-value maths
-        (chance × how good it is), so you always get an answer.
+        An AI decision model reads your situation, works out what could happen
+        with each option and how much it matters to you, then gives every option
+        a chance of being the right call. The one with the best odds is your
+        pick.
       </p>
 
       <aside className="sticky-note">

@@ -145,19 +145,6 @@ textarea.field:focus { border: 2px solid var(--ink); }
 .option-head { display: flex; gap: 10px; align-items: center; }
 .option-num { font-family: "Caveat", cursive; font-size: 1.6rem; width: 26px; flex: none; }
 
-.outcome {
-  display: grid;
-  grid-template-columns: 1fr 1fr auto;
-  gap: 4px 10px;
-  align-items: end;
-  margin: 10px 0 0 36px;
-  padding-bottom: 8px;
-  border-bottom: 1px dotted var(--pencil);
-}
-.outcome-what { grid-column: 1 / -1; }
-.outcome .field { font-size: 0.95rem; }
-.outcome small { color: var(--ink-soft); display: block; font-size: 0.8rem; white-space: nowrap; }
-
 .btn {
   position: relative;
   background: transparent;
@@ -392,7 +379,6 @@ a.btn.primary { color: var(--accent-ink); }
   .page { padding: 20px 16px 150px; }
   .sketch { padding: 16px 14px; }
   .sketch.tilt-l, .sketch.tilt-r { transform: none; }
-  .outcome { margin-left: 0; grid-template-columns: 1fr 1fr auto; }
   .option { padding-left: 8px; }
   .option-num { width: 20px; }
   .form-actions { flex-direction: column-reverse; align-items: stretch; }
