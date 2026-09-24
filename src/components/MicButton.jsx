@@ -8,27 +8,48 @@ const Recognition =
 // Android's continuous mode repeats words, so there it stops after each pause.
 const continuous =
   typeof navigator !== "undefined" && !/Android/i.test(navigator.userAgent);
-// Only one mic listens at a time.
-let active = null;
+// Stop listening after this much silence (the browser may keep going forever).
+const SILENCE_MS = 4000;
+// Only one mic listens at a time: this stops whichever one is on.
+let stopActive = null;
 
 export default function MicButton({ value, onChange, label, maxLength }) {
   const [listening, setListening] = useState(false);
   const [blocked, setBlocked] = useState(false);
-  const rec = useRef(null);
+  const stopRef = useRef(null);
 
-  useEffect(() => () => rec.current?.abort(), []);
+  useEffect(() => () => stopRef.current?.(), []);
 
   if (!Recognition) return null;
 
   function start() {
-    active?.stop();
+    stopActive?.();
     const r = new Recognition();
     r.lang = navigator.language || "en-US";
     r.interimResults = true;
     r.continuous = continuous;
     // Speech is added after whatever is already typed.
     const base = value.trim() ? `${value.trimEnd()} ` : "";
+    let timer;
+    // The button turns off right away; the browser can take a while to
+    // report that it has finished, and sometimes never does.
+    const stop = () => {
+      clearTimeout(timer);
+      setListening(false);
+      if (stopActive === stop) stopActive = null;
+      if (stopRef.current === stop) stopRef.current = null;
+      try {
+        r.stop();
+      } catch {
+        // already stopped
+      }
+    };
+    const waitForSilence = () => {
+      clearTimeout(timer);
+      timer = setTimeout(stop, SILENCE_MS);
+    };
     r.onresult = (e) => {
+      waitForSilence();
       const said = [...e.results]
         .map((res) => res[0].transcript)
         .join(" ")
@@ -39,19 +60,18 @@ export default function MicButton({ value, onChange, label, maxLength }) {
     r.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed")
         setBlocked(true);
+      stop();
     };
-    r.onend = () => {
-      setListening(false);
-      if (active === r) active = null;
-    };
-    rec.current = r;
-    active = r;
+    r.onend = stop;
     try {
       r.start();
-      setListening(true);
     } catch {
-      // start() throws if this recognizer is already running; nothing to do.
+      return; // start() throws if this recognizer is already running
     }
+    stopActive = stop;
+    stopRef.current = stop;
+    setListening(true);
+    waitForSilence();
   }
 
   return (
@@ -68,7 +88,7 @@ export default function MicButton({ value, onChange, label, maxLength }) {
       title={blocked ? "Microphone blocked" : listening ? "Stop" : label}
       aria-pressed={listening}
       disabled={blocked}
-      onClick={() => (listening ? rec.current?.stop() : start())}
+      onClick={() => (listening ? stopRef.current?.() : start())}
     >
       <svg viewBox="0 0 24 24" aria-hidden="true">
         <rect x="9" y="2.5" width="6" height="12" rx="3" />
