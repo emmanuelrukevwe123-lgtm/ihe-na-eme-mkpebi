@@ -41,6 +41,7 @@ Done and committed (git, branch main, local only):
 7. PROJECT_SUMMARY.md written.
 8. OpenRouter engine (lib/openrouter.js, DECIDER=openrouter, OPENROUTER_MODEL is a comma-separated fallback list, default nvidia/nemotron-3-super-120b-a12b:free,openrouter/free; reasoning is disabled because thinking models ran past the 15s timeout; gemma-4 free models were 429 upstream on 2026-09-24). Free tier checked 2026-09-24: 20 req/min, 50 req/day (1000/day after $10 of credits). Fallback tested with a bogus key (401 → EV).
 9. Scheduled switch: DECIDER=jev, DECIDER_NEXT=openrouter, DECIDER_SWITCH_AT=2026-09-24T23:00:00+01:00 (owner is UTC+1). Before then Jev is tried first with OpenRouter as backup; after, OpenRouter only. Set the same three vars on Vercel.
+12. Past decisions live in a hand-drawn envelope (History.jsx, 2026-09-24): phases closed → measure → open → closing; slips fly to/from the envelope's mouth using measured --dx/--dy (offsets relative to .archive, so keep .slips/.history unpositioned). Reduced motion skips the animation.
 11. Voice input (2026-09-24): MicButton.jsx uses the browser Web Speech API (no server, no quota) on the situation and each option; hidden where unsupported (Firefox); speech is appended to typed text; non-continuous on Android (continuous mode repeats words there).
 10. Jev moved to the Vercel AI Gateway (lib/jev.js uses the `ai` package; @typesafe-ai/sdk removed).
 

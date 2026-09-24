@@ -13,6 +13,8 @@
   --shadow: rgba(43, 43, 58, 0.9);
   --note: #fff3a1;
   --tape: rgba(200, 190, 160, 0.55);
+  --envelope: #f0dcb0;
+  --envelope-shade: #e0c48c;
   --wobble-a: 255px 15px 225px 15px / 15px 225px 15px 255px;
   --wobble-b: 15px 225px 15px 255px / 255px 15px 225px 15px;
   --wobble-c: 225px 25px 205px 25px / 25px 205px 25px 225px;
@@ -35,6 +37,8 @@
     --shadow: rgba(0, 0, 0, 0.6);
     --note: #4d4722;
     --tape: rgba(160, 160, 150, 0.35);
+    --envelope: #5b4e36;
+    --envelope-shade: #4a3f2b;
     color-scheme: dark;
   }
 }
@@ -295,12 +299,85 @@ a.btn.primary { color: var(--accent-ink); }
 @keyframes bob { 50% { transform: translateY(-6px); } }
 
 /* History */
-.history { list-style: none; padding: 0; margin: 0; }
-.history li { border-bottom: 1px dashed var(--pencil); padding: 8px 0; }
-.history button { background: none; border: none; text-align: left; padding: 0; width: 100%; }
+/* Past decisions: an envelope whose slips fly out when opened. Offsets are
+   measured against .archive, so .slips and .history must stay unpositioned. */
+.archive { position: relative; margin: 8px 0 28px; }
+.envelope {
+  position: relative;
+  z-index: 2; /* slips fly in and out behind it */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: none;
+  border: none;
+  padding: 4px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+.envelope:focus-visible { outline: 3px dashed var(--accent); outline-offset: 4px; }
+.env-label .label { margin: 0; }
+.env-label .hint { display: block; }
+.env-art { width: 120px; height: 90px; flex: none; overflow: visible; filter: url(#rough); transition: transform 0.2s; }
+.envelope:hover .env-art { transform: rotate(-3deg); }
+.env-art path, .env-art rect { stroke: var(--ink); stroke-width: 2; stroke-linejoin: round; }
+.env-back, .env-front, .env-flap-closed path { fill: var(--envelope); }
+.env-flap-open { fill: var(--envelope-shade); }
+.env-fold { fill: none; opacity: 0.35; }
+.env-paper rect { fill: var(--card); }
+.env-paper path { stroke: var(--pencil); stroke-width: 1.5; }
+.env-seal { fill: var(--accent); }
+
+/* Closing: paper sinks back in, then the flap folds down over it. */
+.env-paper { transition: transform 0.3s ease 0.4s; }
+.env-flap-open { transform-box: fill-box; transform-origin: 50% 100%; transform: scaleY(0); transition: transform 0.18s ease-in 0.6s; }
+.env-flap-closed { transform-box: fill-box; transform-origin: 50% 0; transition: transform 0.18s ease-out 0.78s; }
+/* Opening: the flap flips up, then the paper rises. */
+.archive:is(.measure, .open) .env-flap-closed { transform: scaleY(0); transition: transform 0.18s ease-in 0s; }
+.archive:is(.measure, .open) .env-flap-open { transform: scaleY(1); transition: transform 0.18s ease-out 0.18s; }
+.archive:is(.measure, .open) .env-paper { transform: translateY(-24px); transition: transform 0.35s ease 0.3s; }
+
+.slips { padding-top: 10px; }
+.history { list-style: none; padding: 0; margin: 0; display: grid; gap: 14px; }
+.slip {
+  position: relative;
+  z-index: 1;
+  background: var(--card);
+  padding: 10px 14px;
+  border-radius: var(--wobble-c);
+  box-shadow: 2px 3px 0 -1px var(--shadow);
+}
+.slip::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid var(--ink);
+  border-radius: var(--wobble-c);
+  filter: url(#rough);
+  pointer-events: none;
+}
+.slip:nth-child(odd) { rotate: -0.7deg; }
+.slip:nth-child(even) { rotate: 0.6deg; }
+.history button { background: none; border: none; text-align: left; padding: 0; width: 100%; color: inherit; font: inherit; }
 .history button:hover .h-sit { text-decoration: underline wavy var(--accent); }
 .h-sit { display: block; }
 .h-meta { font-size: 0.85rem; color: var(--ink-soft); }
+.slips-foot { margin-top: 12px; }
+
+.archive.measure .slip { visibility: hidden; }
+.archive.open .slip { animation: slip-out 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15) both; animation-delay: calc(0.3s + var(--i) * 60ms); }
+.archive.closing .slip { animation: slip-in 0.35s ease-in both; animation-delay: calc(var(--back) * 40ms); }
+.archive.open .slips-foot { animation: fade-in 0.3s ease 0.7s both; }
+.archive.closing .slips-foot { opacity: 0; transition: opacity 0.2s; }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes slip-out {
+  from { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, -80px)) scale(0.3); }
+  35% { opacity: 1; }
+}
+@keyframes slip-in {
+  65% { opacity: 1; }
+  to { opacity: 0; transform: translate(var(--dx, 0px), var(--dy, -80px)) scale(0.3); }
+}
 
 .footer { text-align: center; color: var(--ink-soft); font-size: 0.9rem; margin-top: 36px; }
 .footer p { margin: 4px 0; }
