@@ -1,10 +1,22 @@
 const MAX_OPTIONS = 6;
 const MAX_OUTCOMES = 10;
 
-export default function DecisionForm({ situation, setSituation, options, setOptions, onSubmit, loading }) {
-  const update = (i, patch) => setOptions(options.map((o, j) => (j === i ? { ...o, ...patch } : o)));
+export default function DecisionForm({
+  situation,
+  setSituation,
+  options,
+  setOptions,
+  onSubmit,
+  loading,
+}) {
+  const update = (i, patch) =>
+    setOptions(options.map((o, j) => (j === i ? { ...o, ...patch } : o)));
   const updateOutcome = (i, k, patch) =>
-    update(i, { outcomes: options[i].outcomes.map((oc, j) => (j === k ? { ...oc, ...patch } : oc)) });
+    update(i, {
+      outcomes: options[i].outcomes.map((oc, j) =>
+        j === k ? { ...oc, ...patch } : oc,
+      ),
+    });
 
   const filled = options.filter((o) => o.name.trim()).length;
 
@@ -16,7 +28,9 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
         onSubmit();
       }}
     >
-      <label className="label" htmlFor="situation">What's the situation?</label>
+      <label className="label" htmlFor="situation">
+        What's the situation?
+      </label>
       <textarea
         id="situation"
         className="field"
@@ -26,10 +40,13 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
         onChange={(e) => setSituation(e.target.value)}
       />
 
-      <h2 className="label" style={{ marginTop: 22 }}>Your options</h2>
+      <h2 className="label" style={{ marginTop: 22 }}>
+        Your options
+      </h2>
       <p className="hint" style={{ margin: 0 }}>
-        Two to six. Optional: under each option, add outcomes — things that could happen if you pick it, how likely
-        they are, and how good (+8) or bad (−3) they'd be.
+        Two to six. Optional: under each option, add outcomes — things that
+        could happen if you pick it, how likely they are, and how good (+8) or
+        bad (−3) they'd be.
       </p>
 
       {options.map((o, i) => (
@@ -40,7 +57,13 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
               className="field"
               aria-label={`Option ${i + 1} name`}
               maxLength={80}
-              placeholder={i === 0 ? "Take the startup job" : i === 1 ? "Stay where I am" : "Another option"}
+              placeholder={
+                i === 0
+                  ? "Take the startup job"
+                  : i === 1
+                    ? "Stay where I am"
+                    : "Another option"
+              }
               value={o.name}
               onChange={(e) => update(i, { name: e.target.value })}
             />
@@ -63,9 +86,15 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
                 <input
                   className="field"
                   maxLength={120}
-                  placeholder={k === 0 ? "e.g. it goes well and I grow fast" : "e.g. it fails and I'm job-hunting again"}
+                  placeholder={
+                    k === 0
+                      ? "e.g. it goes well and I grow fast"
+                      : "e.g. it fails and I'm job-hunting again"
+                  }
                   value={oc.label ?? ""}
-                  onChange={(e) => updateOutcome(i, k, { label: e.target.value })}
+                  onChange={(e) =>
+                    updateOutcome(i, k, { label: e.target.value })
+                  }
                 />
               </label>
               <label>
@@ -89,14 +118,18 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
                   step="any"
                   inputMode="decimal"
                   value={oc.value}
-                  onChange={(e) => updateOutcome(i, k, { value: e.target.value })}
+                  onChange={(e) =>
+                    updateOutcome(i, k, { value: e.target.value })
+                  }
                 />
               </label>
               <button
                 type="button"
                 className="btn small"
                 aria-label="Remove outcome"
-                onClick={() => update(i, { outcomes: o.outcomes.filter((_, j) => j !== k) })}
+                onClick={() =>
+                  update(i, { outcomes: o.outcomes.filter((_, j) => j !== k) })
+                }
               >
                 ✗
               </button>
@@ -108,7 +141,14 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
               <button
                 type="button"
                 className="btn link"
-                onClick={() => update(i, { outcomes: [...o.outcomes, { label: "", pct: "", value: "" }] })}
+                onClick={() =>
+                  update(i, {
+                    outcomes: [
+                      ...o.outcomes,
+                      { label: "", pct: "", value: "" },
+                    ],
+                  })
+                }
               >
                 + what could happen
               </button>
@@ -126,7 +166,11 @@ export default function DecisionForm({ situation, setSituation, options, setOpti
         >
           + add option
         </button>
-        <button type="submit" className="btn primary" disabled={loading || filled < 2}>
+        <button
+          type="submit"
+          className="btn primary"
+          disabled={loading || filled < 2}
+        >
           {loading ? "thinking…" : "Decide!"}
         </button>
       </div>

@@ -3,7 +3,11 @@ import { jevDecide } from "../lib/jev.js";
 import { groqDecide } from "../lib/groq.js";
 import { openrouterDecide } from "../lib/openrouter.js";
 
-const ENGINES = { jev: jevDecide, groq: groqDecide, openrouter: openrouterDecide };
+const ENGINES = {
+  jev: jevDecide,
+  groq: groqDecide,
+  openrouter: openrouterDecide,
+};
 
 export function validate(body) {
   const { situation = "", options } = body ?? {};
@@ -14,7 +18,8 @@ export function validate(body) {
   const seen = new Set();
   for (const o of options) {
     const name = typeof o?.name === "string" ? o.name.trim() : "";
-    if (!name || name.length > 80) return "Every option needs a name under 80 characters.";
+    if (!name || name.length > 80)
+      return "Every option needs a name under 80 characters.";
     if (seen.has(name.toLowerCase())) return `Option "${name}" appears twice.`;
     seen.add(name.toLowerCase());
     if (o.outcomes === undefined) continue;
@@ -25,7 +30,10 @@ export function validate(body) {
       const v = Number(oc?.value);
       if (!(p >= 0 && p <= 1) || !Number.isFinite(v))
         return `Outcomes for "${name}" need a chance between 0 and 1 and a numeric value.`;
-      if (oc.label !== undefined && (typeof oc.label !== "string" || oc.label.length > 120))
+      if (
+        oc.label !== undefined &&
+        (typeof oc.label !== "string" || oc.label.length > 120)
+      )
         return `Outcome descriptions for "${name}" must be text under 120 characters.`;
     }
   }
@@ -47,22 +55,33 @@ function clean(options) {
 
 function normalize(result, options) {
   const names = options.map((o) => o.name);
-  const raw = names.map((n) => Math.max(0, Number(result.probabilities?.[n]) || 0));
+  const raw = names.map((n) =>
+    Math.max(0, Number(result.probabilities?.[n]) || 0),
+  );
   const total = raw.reduce((a, b) => a + b, 0);
-  if (!names.includes(result.choice) || total === 0) throw new Error(`bad ${result.source} response`);
-  const probabilities = Object.fromEntries(names.map((n, i) => [n, raw[i] / total]));
-  const confidence = Math.min(1, Math.max(0, Number(result.confidence) || probabilities[result.choice]));
+  if (!names.includes(result.choice) || total === 0)
+    throw new Error(`bad ${result.source} response`);
+  const probabilities = Object.fromEntries(
+    names.map((n, i) => [n, raw[i] / total]),
+  );
+  const confidence = Math.min(
+    1,
+    Math.max(0, Number(result.confidence) || probabilities[result.choice]),
+  );
   return {
     choice: result.choice,
     probabilities,
     confidence,
-    ...(typeof result.rationale === "string" && { rationale: result.rationale.slice(0, 600) }),
+    ...(typeof result.rationale === "string" && {
+      rationale: result.rationale.slice(0, 600),
+    }),
     source: result.source,
   };
 }
 
 export default async function handler(req, res) {
-  if (req.method !== "POST") return res.status(405).json({ error: "Use POST." });
+  if (req.method !== "POST")
+    return res.status(405).json({ error: "Use POST." });
   const error = validate(req.body);
   if (error) return res.status(400).json({ error });
 
@@ -71,12 +90,16 @@ export default async function handler(req, res) {
   const names = engineOrder();
   for (const name of names) {
     try {
-      return res.status(200).json(normalize(await ENGINES[name](situation, options), options));
+      return res
+        .status(200)
+        .json(normalize(await ENGINES[name](situation, options), options));
     } catch (e) {
       console.error(`[decide] ${name} failed:`, e.message);
     }
   }
-  const note = names.length ? "The AI engine was unavailable, so this uses expected value." : undefined;
+  const note = names.length
+    ? "The AI engine was unavailable, so this uses expected value."
+    : undefined;
   return res.status(200).json(evDecide(options, note));
 }
 
