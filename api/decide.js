@@ -13,8 +13,11 @@ export function validate(body) {
   const { situation = "", options } = body ?? {};
   if (typeof situation !== "string" || situation.length > 4000)
     return "Situation must be text under 4000 characters.";
+  // Options are optional: without them the AI works them out from the situation.
+  if (options === undefined || (Array.isArray(options) && !options.length))
+    return situation.trim() ? null : "Describe the situation first.";
   if (!Array.isArray(options) || options.length < 2 || options.length > 6)
-    return "Give between 2 and 6 options.";
+    return "Give between 2 and 6 options, or none and let the AI find them.";
   const seen = new Set();
   for (const o of options) {
     const name = typeof o?.name === "string" ? o.name.trim() : "";
@@ -40,7 +43,7 @@ export function validate(body) {
   return null;
 }
 
-function clean(options) {
+function clean(options = []) {
   return options.map((o) => ({
     name: o.name.trim(),
     ...(o.outcomes?.length && {
@@ -62,7 +65,15 @@ function texts(list, max, len) {
 }
 
 function normalize(result, options) {
-  const names = options.map((o) => o.name);
+  // No options sent: the model worked them out and lists them in result.options.
+  const found = !options.length;
+  const seen = new Set();
+  const names = found
+    ? texts(result.options, 6, 80).filter(
+        (n) => !seen.has(n.toLowerCase()) && seen.add(n.toLowerCase()),
+      )
+    : options.map((o) => o.name);
+  if (names.length < 2) throw new Error(`${result.source} found no options`);
   const raw = names.map((n) =>
     Math.max(0, Number(result.probabilities?.[n]) || 0),
   );
@@ -97,6 +108,7 @@ function normalize(result, options) {
     ...(typeof result.rationale === "string" && {
       rationale: result.rationale.slice(0, 600),
     }),
+    ...(found && { foundOptions: true }),
     source: result.source,
   };
 }
@@ -109,7 +121,8 @@ export default async function handler(req, res) {
 
   const situation = (req.body.situation ?? "").trim();
   const options = clean(req.body.options);
-  const names = engineOrder();
+  // Jev can only choose between listed options, so it sits out when there are none.
+  const names = engineOrder().filter((n) => options.length || n !== "jev");
   for (const name of names) {
     try {
       return res
@@ -119,9 +132,10 @@ export default async function handler(req, res) {
       console.error(`[decide] ${name} failed:`, e.message);
     }
   }
-  // Without outcomes, expected value is a tie and would just pick option 1.
+  // Without outcomes, expected value is a tie and would just pick option 1,
+  // and without options there is nothing for it to compare.
   const hasOutcomes = options.some((o) => o.outcomes?.length);
-  if (names.length && !hasOutcomes)
+  if (!hasOutcomes && (names.length || !options.length))
     return res
       .status(503)
       .json({ error: "Couldn't make a pick right now. Try again in a moment." });

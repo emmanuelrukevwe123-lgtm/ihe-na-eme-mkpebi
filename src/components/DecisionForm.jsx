@@ -1,8 +1,9 @@
-import { useState } from "react";
 import MicButton from "./MicButton.jsx";
 
 const MAX_OPTIONS = 6;
 
+// Options are optional: with none, the AI works them out from the situation.
+// "+ add option" opens two boxes (you need two to compare), then adds one each tap.
 export default function DecisionForm({
   situation,
   setSituation,
@@ -15,44 +16,8 @@ export default function DecisionForm({
     setOptions(options.map((o, j) => (j === i ? { ...o, ...patch } : o)));
 
   const filled = options.filter((o) => o.name.trim()).length;
-  const [finding, setFinding] = useState(false);
-  const [findNote, setFindNote] = useState("");
-
-  // After the situation is spoken, let the AI fill in the options, but only
-  // if the user hasn't started typing them.
-  async function findOptions(text) {
-    if (filled) return;
-    setFinding(true);
-    setFindNote("");
-    try {
-      const res = await fetch("/api/options", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ situation: text }),
-        signal: AbortSignal.timeout(20000),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok)
-        throw new Error(
-          data.error || "Couldn't find the options. Type them in instead.",
-        );
-      if (!data.options?.length)
-        return setFindNote("I couldn't spot the options. Type them in below.");
-      setOptions((prev) =>
-        prev.some((o) => o.name.trim())
-          ? prev
-          : data.options.map((name) => ({ name })),
-      );
-    } catch (e) {
-      setFindNote(
-        e.name === "TimeoutError"
-          ? "Couldn't find the options. Type them in instead."
-          : e.message,
-      );
-    } finally {
-      setFinding(false);
-    }
-  }
+  // One option alone gets an explanation from Decider rather than a dead button.
+  const canDecide = filled >= 2 || situation.trim();
 
   return (
     <form
@@ -69,7 +34,6 @@ export default function DecisionForm({
         <MicButton
           value={situation}
           onChange={setSituation}
-          onDone={findOptions}
           label="Speak the situation"
           maxLength={4000}
         />
@@ -78,29 +42,24 @@ export default function DecisionForm({
         id="situation"
         className="field"
         maxLength={4000}
-        placeholder="e.g. I got two job offers and need to answer by Friday. The startup pays less but I'd learn a lot; I have rent to cover…"
+        placeholder="e.g. I got two job offers: a startup that pays less but I'd learn a lot, or staying where I am. I have rent to cover and need to answer by Friday…"
         value={situation}
         onChange={(e) => setSituation(e.target.value)}
       />
       <p className="hint" style={{ margin: "4px 0 0" }}>
-        The more you say about what matters to you, the better the pick.
+        Say what you're torn between and what matters to you. The AI works out
+        the options.
       </p>
 
-      <h2 className="label" style={{ marginTop: 22 }}>
-        Your options
-      </h2>
-      <p className="hint" style={{ margin: 0 }}>
-        The two to six choices you're torn between.
-      </p>
-      {finding && (
-        <p className="hint finding" aria-live="polite">
-          picking out your options<span>.</span><span>.</span><span>.</span>
-        </p>
-      )}
-      {findNote && !finding && (
-        <p className="hint" role="status">
-          {findNote}
-        </p>
+      {options.length > 0 && (
+        <>
+          <h2 className="label" style={{ marginTop: 22 }}>
+            Your options
+          </h2>
+          <p className="hint" style={{ margin: 0 }}>
+            Optional. Remove them all to let the AI find them.
+          </p>
+        </>
       )}
 
       {options.map((o, i) => (
@@ -132,16 +91,14 @@ export default function DecisionForm({
               label={`Speak option ${i + 1}`}
               maxLength={80}
             />
-            {options.length > 2 && (
-              <button
-                type="button"
-                className="btn small"
-                aria-label={`Remove option ${i + 1}`}
-                onClick={() => setOptions(options.filter((_, j) => j !== i))}
-              >
-                ✗
-              </button>
-            )}
+            <button
+              type="button"
+              className="btn small"
+              aria-label={`Remove option ${i + 1}`}
+              onClick={() => setOptions(options.filter((_, j) => j !== i))}
+            >
+              ✗
+            </button>
           </div>
         </div>
       ))}
@@ -151,14 +108,20 @@ export default function DecisionForm({
           type="button"
           className="btn"
           disabled={options.length >= MAX_OPTIONS}
-          onClick={() => setOptions([...options, { name: "" }])}
+          onClick={() =>
+            setOptions(
+              options.length
+                ? [...options, { name: "" }]
+                : [{ name: "" }, { name: "" }],
+            )
+          }
         >
           + add option
         </button>
         <button
           type="submit"
           className="btn primary"
-          disabled={loading || finding || filled < 2}
+          disabled={loading || !canDecide}
         >
           {loading ? "thinking…" : "Decide!"}
         </button>

@@ -1,7 +1,7 @@
 # ihe-na-eme-mkpebi ("Decide For Me")
 Project, GitHub repo and Vercel project name: ihe-na-eme-mkpebi (Igbo, roughly "the thing that makes decisions"). The local folder is funproJX\ihe-na-eme-mkpebi (renamed from jev-decider on 2026-09-24).
 Hand-drawn decision helper: situation + 2–6 options (optional outcomes) → pick, per-option probabilities, confidence.
-Vite + React SPA (JavaScript, NOT TypeScript) + Vercel functions api/decide.js and api/options.js. ES modules only. Node 20+.
+Vite + React SPA (JavaScript, NOT TypeScript) + one Vercel function at api/decide.js. ES modules only. Node 20+.
 Full write-up: PROJECT_SUMMARY.md. Original plan: `C:\Users\Manuel Ruky\Downloads\JEV decision app build plan.md`.
 Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx).
 
@@ -12,10 +12,10 @@ Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx
 - Windows host: the PowerShell tool is primary. Headless UI checks used playwright-core with `channel: "msedge"`, installed in a scratch dir, not in this repo.
 
 ## Contract
-POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
+POST /api/decide {situation, options?:[{name, outcomes?:[{label?,p,value}]}]}  (options optional: 0 or 2–6)
 -> {choice, probabilities, confidence, understood?, reasons?, whyNot?, changeIf?, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
 Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale, but only when outcomes were sent; with names only the API returns 503 {error} (EV would be a meaningless tie). OpenRouter retries once on a network error, 429, 5xx or unreadable reply (not on timeout or other 4xx), so EV is used only when OpenRouter really does not work.
-POST /api/options {situation} -> {options: string[]} (OpenRouter only, via openrouterJSON in lib/openrouter.js; [] if no decision found; 503 {error} on failure). The form calls it automatically when the situation mic stops and every option box is empty; it never overwrites typed options or the situation text.
+Options are optional: with none (situation required), the chat engines work them out in the same call (prompt asks for "options"), the reply has foundOptions: true, and Jev is skipped (it can only choose between listed options). The form hides option boxes until "+ add option" (first tap opens two); the result offers "edit them and decide again" when options were found. Landing page is deliberately minimal (owner's request 2026-09-24): don't add feature explanations there.
 The UI sends option names only (no outcomes): the AI does the weighing. The trust fields (understood = what matters to the user, reasons, whyNot per losing option, changeIf) come from OpenRouter/Groq via the shared prompt in lib/prompt.js; the card also labels confidence as clear winner / leaning / close call (≥70 / ≥55 / below). Jev's evaluate API returns only choice + probabilities, so Jev answers have none. outcomes stay in the API contract for direct callers and the EV fallback.
 
 ## Rules

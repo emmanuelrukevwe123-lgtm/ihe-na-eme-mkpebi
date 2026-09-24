@@ -13,22 +13,10 @@ const SILENCE_MS = 4000;
 // Only one mic listens at a time: this stops whichever one is on.
 let stopActive = null;
 
-// onDone(text) runs once when listening stops, if anything was heard.
-export default function MicButton({
-  value,
-  onChange,
-  onDone,
-  label,
-  maxLength,
-}) {
+export default function MicButton({ value, onChange, label, maxLength }) {
   const [listening, setListening] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const stopRef = useRef(null);
-  // Listening outlives the render that started it, so read the latest onDone.
-  const onDoneRef = useRef(onDone);
-  useEffect(() => {
-    onDoneRef.current = onDone;
-  });
 
   useEffect(() => () => stopRef.current?.(), []);
 
@@ -43,7 +31,6 @@ export default function MicButton({
     // Speech is added after whatever is already typed.
     const base = value.trim() ? `${value.trimEnd()} ` : "";
     let timer;
-    let heard = "";
     let stopped = false;
     // The button turns off right away; the browser can take a while to
     // report that it has finished, and sometimes never does.
@@ -59,7 +46,6 @@ export default function MicButton({
       } catch {
         // already stopped
       }
-      if (heard) onDoneRef.current?.(heard);
     };
     const waitForSilence = () => {
       clearTimeout(timer);
@@ -73,8 +59,7 @@ export default function MicButton({
         .join(" ")
         .replace(/\s+/g, " ")
         .trim();
-      heard = (base + said).slice(0, maxLength);
-      onChange(heard);
+      onChange((base + said).slice(0, maxLength));
     };
     r.onerror = (e) => {
       if (e.error === "not-allowed" || e.error === "service-not-allowed")

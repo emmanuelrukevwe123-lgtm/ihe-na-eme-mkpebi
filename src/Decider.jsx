@@ -7,7 +7,8 @@ import Footer from "./components/Footer.jsx";
 const STORE_KEY = "decide-history-v1";
 const DRAFT_KEY = "decide-draft-v1";
 const MAX_HISTORY = 20;
-const EMPTY_OPTIONS = [{ name: "" }, { name: "" }];
+// Options are optional: none means the AI works them out from the situation.
+const EMPTY_OPTIONS = [];
 
 function load(key) {
   try {
@@ -30,10 +31,11 @@ function loadHistory() {
   return Array.isArray(items) ? items : [];
 }
 
-// Older drafts and history entries also carry outcomes; keep only the names.
+// Older drafts and history entries also carry outcomes and empty boxes;
+// keep only the filled-in names.
 const namesOnly = (options) =>
-  Array.isArray(options) && options.length >= 2 && options.every((o) => typeof o?.name === "string")
-    ? options.map((o) => ({ name: o.name }))
+  Array.isArray(options)
+    ? options.filter((o) => typeof o?.name === "string" && o.name.trim()).map((o) => ({ name: o.name }))
     : null;
 
 function loadDraft() {
@@ -49,9 +51,17 @@ const saveHistory = (items) => save(STORE_KEY, items);
 
 function toPayload(situation, options) {
   const names = options.map((o) => o.name.trim()).filter(Boolean);
+  if (names.length === 1)
+    return { error: "Add at least one more option, or remove it and let the AI find them." };
+  if (!names.length && !situation.trim()) return { error: "Describe the situation first." };
   if (new Set(names.map((n) => n.toLowerCase())).size !== names.length)
     return { error: "Two options have the same name." };
-  return { body: { situation: situation.trim(), options: names.map((name) => ({ name })) } };
+  return {
+    body: {
+      situation: situation.trim(),
+      ...(names.length && { options: names.map((name) => ({ name })) }),
+    },
+  };
 }
 
 export default function Decider() {
@@ -124,7 +134,15 @@ export default function Decider() {
           thinking<span>.</span><span>.</span><span>.</span>
         </p>
       )}
-      {result && !loading && <ResultCard result={result} />}
+      {result && !loading && (
+        <ResultCard
+          result={result}
+          onEditOptions={(names) => {
+            setOptions(names.map((name) => ({ name })));
+            document.getElementById("situation")?.scrollIntoView({ behavior: "smooth", block: "center" });
+          }}
+        />
+      )}
 
       <History
         items={history}

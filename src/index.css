@@ -274,6 +274,7 @@ a.btn.primary { color: var(--accent-ink); }
 .understood .label { margin: 0 0 6px; font-size: 1.2rem; }
 .understood ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 8px; padding: 0; margin: 0; }
 .understood li { padding: 1px 10px; border: 1.5px solid var(--pencil); border-radius: var(--wobble-b); color: var(--ink-soft); font-size: 0.95rem; }
+.found-note { margin: 4px 0 -4px; }
 .rationale { font-style: normal; border-left: 3px double var(--pencil); padding-left: 12px; margin: 10px 0; color: var(--ink-soft); }
 .stamp {
   display: inline-block;
@@ -288,10 +289,9 @@ a.btn.primary { color: var(--accent-ink); }
 .disclaimer { font-size: 0.85rem; color: var(--ink-soft); margin-top: 12px; }
 
 .loading { font-family: "Caveat", cursive; font-size: 1.6rem; }
-.loading span, .finding span { display: inline-block; animation: bob 0.9s infinite; }
-.loading span:nth-child(2), .finding span:nth-child(2) { animation-delay: 0.15s; }
-.loading span:nth-child(3), .finding span:nth-child(3) { animation-delay: 0.3s; }
-.finding { font-family: "Caveat", cursive; font-size: 1.3rem; color: var(--ink); margin: 6px 0 0; }
+.loading span { display: inline-block; animation: bob 0.9s infinite; }
+.loading span:nth-child(2) { animation-delay: 0.15s; }
+.loading span:nth-child(3) { animation-delay: 0.3s; }
 @keyframes bob { 50% { transform: translateY(-6px); } }
 
 /* History */
@@ -358,7 +358,6 @@ a.btn.primary { color: var(--accent-ink); }
 }
 .sticky-note h3 { font-size: 2rem; margin: 0 0 6px; }
 .sticky-note p { margin: 0 0 10px; }
-.cta-bottom { justify-content: center; }
 
 /* Decorative pencil resting on the desk, behind the page content. */
 .page { position: relative; z-index: 1; }

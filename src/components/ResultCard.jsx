@@ -11,7 +11,7 @@ const pct = (x) => `${Math.round(x * 100)}%`;
 const sureness = (c) =>
   c >= 0.7 ? "clear winner" : c >= 0.55 ? "leaning" : "close call";
 
-export default function ResultCard({ result }) {
+export default function ResultCard({ result, onEditOptions }) {
   const entries = Object.entries(result.probabilities).sort(
     (a, b) => b[1] - a[1],
   );
@@ -46,6 +46,12 @@ export default function ResultCard({ result }) {
           <path d="M12 14 C 60 9, 120 15, 186 11" />
         </svg>
       </div>
+
+      {result.foundOptions && (
+        <p className="hint found-note">
+          I worked out these options from what you wrote:
+        </p>
+      )}
 
       {entries.map(([name, p]) => (
         <div
@@ -106,6 +112,15 @@ export default function ResultCard({ result }) {
       )}
 
       {result.rationale && <p className="rationale">{result.rationale}</p>}
+      {result.foundOptions && onEditOptions && (
+        <button
+          type="button"
+          className="btn link"
+          onClick={() => onEditOptions(entries.map(([name]) => name))}
+        >
+          ✎ wrong options? edit them and decide again
+        </button>
+      )}
       <p className="disclaimer">
         This is advice, not an order. Sleep on the big ones.
       </p>
