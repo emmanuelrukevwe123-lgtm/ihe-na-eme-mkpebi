@@ -35,6 +35,16 @@ export default function ResultCard({ result }) {
       <p className="confidence">
         confidence: <mark>{pct(result.confidence)}</mark>
       </p>
+      {result.reasons?.length > 0 && (
+        <>
+          <h3 className="label reasons-head">Why go with it</h3>
+          <ul className="reasons">
+            {result.reasons.map((r) => (
+              <li key={r}>{r}</li>
+            ))}
+          </ul>
+        </>
+      )}
       {result.rationale && <p className="rationale">{result.rationale}</p>}
       <p className="disclaimer">This is advice, not an order. Sleep on the big ones.</p>
     </section>

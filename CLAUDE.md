@@ -13,9 +13,9 @@ Owner's GitHub: https://github.com/emmanuelrukevwe123-lgtm (linked in Footer.jsx
 
 ## Contract
 POST /api/decide {situation, options:[{name, outcomes?:[{label?,p,value}]}]}
--> {choice, probabilities, confidence, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
+-> {choice, probabilities, confidence, reasons?, rationale?, source: "jev"|"groq"|"openrouter"|"ev"}
 Engine chosen by env DECIDER (jev | groq | openrouter | ev, default ev). Optional DECIDER_NEXT is tried if DECIDER fails; from DECIDER_SWITCH_AT (ISO time with offset) only DECIDER_NEXT is used. If every engine fails, lib/ev.js answers with a note in rationale, but only when outcomes were sent; with names only the API returns 503 {error} (EV would be a meaningless tie). OpenRouter retries once on a network error, 429, 5xx or unreadable reply (not on timeout or other 4xx), so EV is used only when OpenRouter really does not work.
-The UI sends option names only (no outcomes): the AI does the weighing. outcomes stay in the API contract for direct callers and the EV fallback.
+The UI sends option names only (no outcomes): the AI does the weighing. reasons (2–4 short strings, shown as "Why go with it") come from OpenRouter/Groq; Jev's evaluate API returns only choice + probabilities, so Jev answers have none. outcomes stay in the API contract for direct callers and the EV fallback.
 
 ## Rules
 - IMPORTANT: API keys (AI_GATEWAY_API_KEY, GROQ_API_KEY, OPENROUTER_API_KEY) are server-only, read via process.env in api/ or lib/. Never use a VITE_ prefix for secrets.

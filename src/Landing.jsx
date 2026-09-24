@@ -7,11 +7,11 @@ const STEPS = [
   },
   {
     title: "Name your options",
-    body: "Two to six choices. Just the names. No numbers, no maths, no pros-and-cons list.",
+    body: "List the two to six choices you're torn between.",
   },
   {
     title: "Get a pick",
-    body: "The AI weighs everything for you and tells you which option to go with, the odds for each, and how sure it is.",
+    body: "The AI weighs everything for you and tells you which option to go with, why, the odds for each, and how sure it is.",
   },
 ];
 

@@ -68,10 +68,15 @@ function normalize(result, options) {
     1,
     Math.max(0, Number(result.confidence) || probabilities[result.choice]),
   );
+  const reasons = (Array.isArray(result.reasons) ? result.reasons : [])
+    .filter((r) => typeof r === "string" && r.trim())
+    .slice(0, 4)
+    .map((r) => r.trim().slice(0, 200));
   return {
     choice: result.choice,
     probabilities,
     confidence,
+    ...(reasons.length && { reasons }),
     ...(typeof result.rationale === "string" && {
       rationale: result.rationale.slice(0, 600),
     }),

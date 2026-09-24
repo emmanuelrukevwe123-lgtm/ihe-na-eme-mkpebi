@@ -40,7 +40,7 @@ export default function DecisionForm({
         Your options
       </h2>
       <p className="hint" style={{ margin: 0 }}>
-        Two to six. Just name them. The weighing is on us.
+        The two to six choices you're torn between.
       </p>
 
       {options.map((o, i) => (
