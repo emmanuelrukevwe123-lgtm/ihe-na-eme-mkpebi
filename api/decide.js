@@ -53,6 +53,14 @@ function clean(options) {
   }));
 }
 
+// Non-empty strings from a model reply, trimmed and capped.
+function texts(list, max, len) {
+  return (Array.isArray(list) ? list : [])
+    .filter((t) => typeof t === "string" && t.trim())
+    .slice(0, max)
+    .map((t) => t.trim().slice(0, len));
+}
+
 function normalize(result, options) {
   const names = options.map((o) => o.name);
   const raw = names.map((n) =>
@@ -68,15 +76,24 @@ function normalize(result, options) {
     1,
     Math.max(0, Number(result.confidence) || probabilities[result.choice]),
   );
-  const reasons = (Array.isArray(result.reasons) ? result.reasons : [])
-    .filter((r) => typeof r === "string" && r.trim())
-    .slice(0, 4)
-    .map((r) => r.trim().slice(0, 200));
+  const reasons = texts(result.reasons, 4, 200);
+  const understood = texts(result.understood, 4, 80);
+  // Only keep "why not" lines for real options that lost.
+  const whyNot = Object.fromEntries(
+    names
+      .filter((n) => n !== result.choice)
+      .map((n) => [n, texts([result.whyNot?.[n]], 1, 200)[0]])
+      .filter(([, why]) => why),
+  );
+  const changeIf = texts([result.changeIf], 1, 250)[0];
   return {
     choice: result.choice,
     probabilities,
     confidence,
+    ...(understood.length && { understood }),
     ...(reasons.length && { reasons }),
+    ...(Object.keys(whyNot).length && { whyNot }),
+    ...(changeIf && { changeIf }),
     ...(typeof result.rationale === "string" && {
       rationale: result.rationale.slice(0, 600),
     }),

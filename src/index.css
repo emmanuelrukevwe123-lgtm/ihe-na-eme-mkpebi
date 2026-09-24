@@ -254,10 +254,18 @@ a.btn.primary { color: var(--accent-ink); }
 
 .confidence { font-family: "Caveat", cursive; font-size: 1.5rem; margin: 14px 0 4px; }
 .confidence mark { background: var(--marker); color: inherit; padding: 0 6px; border-radius: var(--wobble-b); }
-.reasons-head { margin: 18px 0 4px; }
+.reasons-head { margin: 18px 0 4px; line-height: 1.15; }
 .reasons { list-style: none; padding: 0; margin: 0 0 10px; }
 .reasons li { position: relative; padding-left: 28px; margin: 6px 0; }
 .reasons li::before { content: "✓"; position: absolute; left: 4px; top: -2px; font-family: "Caveat", cursive; font-size: 1.4rem; color: var(--accent); }
+.why-not li::before { content: "✗"; color: var(--pencil); }
+.why-not b { font-weight: normal; text-decoration: underline wavy var(--pencil) 1px; text-underline-offset: 3px; }
+.change-if { margin: 4px 0 10px; padding: 6px 12px; border-left: 3px solid var(--marker); }
+.sureness { color: var(--ink-soft); }
+.understood { margin: -4px 0 18px; padding-bottom: 12px; border-bottom: 2px dashed var(--pencil); }
+.understood .label { margin: 0 0 6px; font-size: 1.2rem; }
+.understood ul { list-style: none; display: flex; flex-wrap: wrap; gap: 6px 8px; padding: 0; margin: 0; }
+.understood li { padding: 1px 10px; border: 1.5px solid var(--pencil); border-radius: var(--wobble-b); color: var(--ink-soft); font-size: 0.95rem; }
 .rationale { font-style: normal; border-left: 3px double var(--pencil); padding-left: 12px; margin: 10px 0; color: var(--ink-soft); }
 .stamp {
   display: inline-block;
